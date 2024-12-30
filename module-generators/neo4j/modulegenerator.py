@@ -22,7 +22,7 @@ import os, logging, sys, argparse, datetime
 # https://neo4j.com/docs/api/python-driver/current/
 from neo4j import GraphDatabase
 
-MODULE_NAME = 'neo4j_modulegenerator'
+VERSION = '0.0.0'
 
 def _authenticated_driver(uri=None, username=None, password=None):
     """
@@ -64,8 +64,42 @@ def _setup(output_directory=None):
 
     if output_directory not in os.listdir():
         os.makedirs(output_directory)
-        with open ('.gitignore', '+a') as gitignore:
-            gitignore.write(f'{output_directory}\n')
+        _append('.gitignore', f'{output_directory}\n')
+
+def _append(filename, text):
+    """
+    Appends text to the end of the specified file with a newline.
+
+    Parameters
+    ----------
+    filename: str
+        The _ in _graph.py
+
+    text: str
+        Text to write to the module.
+
+    Returns
+    -------
+    None
+    """
+    with open(filename, '+a') as outfile:
+        outfile.write(f'{text}\n')
+
+def _append_imports(filename, imports):
+    """
+    Appends imports to the beginning of the file.
+
+    Parameters
+    ----------
+    imports: list(str)
+        A list of imports to be written to the top of the file.
+
+    Returns
+    -------
+    None
+    """
+    for module in imports:
+        _append(filename, f'import {module}')
 
 def generate_module(uri=None, username=None, password=None, graph=None, output_directory=os.environ['PWD']):
     """
@@ -94,15 +128,23 @@ def generate_module(uri=None, username=None, password=None, graph=None, output_d
     _setup(output_directory=output_directory)
 
     def _log(msg):
-        with open('modulegenerator.out', 'a') as log:
+        with open('modulegenerator.out', '+a') as log:
             log.write(f'{datetime.datetime.now()}: {msg}\n')
 
 
     module_name = f'{graph if graph is not None else "new"}graph'
-    output_file = f'{output_directory}/{module_name}.py'
-    _log(f'Generating module: {output_file}')
+    filename = f'{output_directory}/{module_name}.py'
+    _log(f'Generating module: {filename}')
 
-    return output_file
+    if os.path.exists(filename):
+        _log(f'Old module found; deleting.')
+        os.remove(filename)
+
+    _log('Appending imports to module')
+    _append_imports(filename, imports=['neo4j'])
+
+    _log(f"{filename} successfully generated.")
+    return filename
 
 if __name__ == '__main__':
     print('neo4j/modulegenerator is being run as a script.')
@@ -122,12 +164,12 @@ if __name__ == '__main__':
     password = args.password
 
     # Default output is newgraph.py
-    graphname = args.graph
+    graph = args.graph
 
     # If no output argument is passed, use the 
     output_directory = args.output if args.output is not None else 'generated_modules'
                       
-    print(f'Generating: {graphname}graph.py',
+    print(f'Generating: {graph}graph.py',
           f'At: {uri}',
           f'Username: {username}',
           f'Password: {"*" * len(password)}',
@@ -137,7 +179,7 @@ if __name__ == '__main__':
     # Generating the module with our neo4j-dev hardcoded. This instance contains
     # only sample data.
     generate_module(uri='bolt://localhost:7687', 
-                    graph='demo', 
+                    graph=graph, 
                     username=username, 
                     password=password, 
                     output_directory=output_directory)

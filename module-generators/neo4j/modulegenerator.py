@@ -36,6 +36,12 @@ profile = {
     'password':'neo4j-dev'
 }
 
+queries = {
+    'server_timestamp': {
+        'text': 'RETURN localdatetime() AS `time`',
+        'return_value': 'time'}
+}
+
 def _authenticated_driver(uri=profile['uri'], username=profile['username'], password=profile['password']):
     """
     Internal method to set up an authenticated driver.
@@ -87,7 +93,7 @@ def _server_timestamp():
     str:
         Timestamp from server.
     """
-    return _query(query_text="RETURN localdatetime() AS `time`").records[0].get('time')
+    return _query(query_text=queries['server_timestamp']['text']).records[0].get(queries['server_timestamp']['return_value'])
 
 def _setup(output_directory=None):
     """

@@ -16,10 +16,16 @@ This program accepts the following command-line inputs:
 """
 
 # Python standard libraries
-import os, logging, sys, argparse, datetime
+import os
+import logging
+import sys
+import argparse
+import datetime
+import inspect
 
 # Pip installs
 # https://neo4j.com/docs/api/python-driver/current/
+import neo4j
 from neo4j import GraphDatabase
 
 VERSION = '0.0.0'
@@ -36,11 +42,60 @@ profile = {
     'password':'neo4j-dev'
 }
 
-queries = {
-    'server_timestamp': {
-        'text': 'RETURN localdatetime() AS `time`',
-        'return_value': 'time'}
-}
+class Queries:
+    server_timestamp = {
+        'text': 'RETURN datetime() AS timestamp;',
+        'params': None
+    }
+    
+    labels = {
+        'text': 'CALL db.labels();',
+        'params': None
+     }
+    
+###############################################################################
+# _Internal functions
+# These make the public functions work. While they can be called directly,
+# they are not designed for that use and may not be as easy to work with as
+# the public functions.
+###############################################################################
+
+def _append(filename, text):
+    """
+    Appends text to the end of the specified file with a newline.
+
+    Parameters
+    ----------
+    filename: str
+        The _ in _graph.py
+
+    text: str, list(str)
+        Text to write to the module.
+        Can be a single string to append or a list of strings.
+
+    Returns
+    -------
+    None
+    """
+
+    with open(filename, 'a+') as outfile:
+        outfile.write(f'{text}\n')
+        
+def _append_imports(filename, imports):
+    """
+    Appends imports to the beginning of the file.
+
+    Parameters
+    ----------
+    imports: list(str)
+        A list of imports to be written to the top of the file.
+
+    Returns
+    -------
+    None
+    """
+    for module in imports:
+        _append(filename, f'import {module}')
 
 def _authenticated_driver(uri=profile['uri'], username=profile['username'], password=profile['password']):
     """
@@ -61,6 +116,24 @@ def _authenticated_driver(uri=profile['uri'], username=profile['username'], pass
     """
     return GraphDatabase.driver(uri, auth=(username, password))
 
+def _get_db_labels():
+    """
+    Returns a list of labels in use by the database.
+
+    Parameters
+    ----------
+    None
+
+    Returns
+    -------
+    list(str):
+        A list of Neo4j labels in use by the database.
+    """
+    text = Queries.labels['text']
+    params = Queries.labels['params']
+    results = _query(text, params)
+    return list(map(lambda row: row['label'], results))
+
 def _query(query_text=None, query_params=None):
     """
     Submits a parameterized Cypher query to Neo4j.
@@ -76,13 +149,13 @@ def _query(query_text=None, query_params=None):
     -------
     A tuple of dictionaries, representing entities returned by the query.
     """
-    driver = _authenticated_driver()
-    return driver.execute_query(query_text, query_params)
+    with _authenticated_driver().session() as session:
+        return session.run(query_text, query_params).data()
 
 def _server_timestamp():
     """
     Retrieves a timestamp from the neo4j isntance and prints a message 
-    to the screen.
+    to the screen. 
 
     Parameters
     ----------
@@ -93,65 +166,13 @@ def _server_timestamp():
     str:
         Timestamp from server.
     """
-    return _query(query_text=queries['server_timestamp']['text']).records[0].get(queries['server_timestamp']['return_value'])
+    text, params = Queries.server_timestamp()
 
-def _setup(output_directory=None):
-    """
-    A setup function to create directories as needed.
-    """
+    return _query(query_text=text, query_params=params)[0]['timestamp'].iso_format()
 
-    if output_directory is None:
-        raise ValueError(f'_setup requires a valid directory name. Got `{output_directory}` instead')
-
-    def _create_and_ignore(directory_name):
-        """
-        Creates the subdirectory in the working directory and
-        adds it to a local .gitignore.
-
-        Parameters
-        ----------
-        directory_name: str
-            The name of the directory to create.
-        """
-
-    if output_directory not in os.listdir():
-        os.makedirs(output_directory)
-        _append('.gitignore', f'{output_directory}\n')
-
-def _append(filename, text):
-    """
-    Appends text to the end of the specified file with a newline.
-
-    Parameters
-    ----------
-    filename: str
-        The _ in _graph.py
-
-    text: str
-        Text to write to the module.
-
-    Returns
-    -------
-    None
-    """
-    with open(filename, '+a') as outfile:
-        outfile.write(f'{text}\n')
-
-def _append_imports(filename, imports):
-    """
-    Appends imports to the beginning of the file.
-
-    Parameters
-    ----------
-    imports: list(str)
-        A list of imports to be written to the top of the file.
-
-    Returns
-    -------
-    None
-    """
-    for module in imports:
-        _append(filename, f'import {module}')
+###############################################################################
+# Public functions
+###############################################################################
 
 def generate_module(uri=None, username=None, password=None, graph=None, output_directory=os.environ['PWD']):
     """
@@ -177,15 +198,14 @@ def generate_module(uri=None, username=None, password=None, graph=None, output_d
     str:
         The filepath to the generated module.
     """
-    _setup(output_directory=output_directory)
 
     def _log(msg):
         with open('modulegenerator.out', '+a') as log:
             log.write(f'{datetime.datetime.now()}: {msg}\n')
 
 
-    module_name = f'{graph if graph is not None else "new"}graph'
-    filename = f'{output_directory}/{module_name}.py'
+    module_name = f"""{graph if graph is not None else "new"}graph"""
+    filename = f"""{module_name}.py"""
     _log(f'Generating module: {filename}')
 
     if os.path.exists(filename):
@@ -195,13 +215,21 @@ def generate_module(uri=None, username=None, password=None, graph=None, output_d
     # Boilerplate
     _log('Writing boilerplate to top of file.')
     _append(filename, f'# Date generated: {_server_timestamp()}\n')
+    _append(filename, f"# Generated with modulegenerator version {VERSION}")
+    _append(filename, f"# Generated with neo4j driver version {neo4j.__version__}")
 
     _log('Appending imports to module')
     _append_imports(filename, imports=['neo4j'])
+    _append(filename, 'from neo4j import GraphDatabase\n')
 
     # get an authenticated driver
     driver = _authenticated_driver(uri=uri, username=username, password=password)
-    _server_timestamp()
+
+    # Copy query functions into the generated module.
+    _append(filename, "".join(inspect.getsourcelines(modulegenerator.Queries)[0]))
+    _append(filename, "".join(inspect.getsourcelines(modulegenerator._authenticated_driver)[0]))
+    _append(filename, "".join(inspect.getsourcelines(modulegenerator._query)[0]))
+    _append(filename, "".join(inspect.getsourcelines(modulegenerator._server_timestamp)[0]))
 
     _log(f"{filename} successfully generated.")
     return filename

@@ -43,15 +43,27 @@ profile = {
 }
 
 class Queries:
-    server_timestamp = {
-        'text': 'RETURN datetime() AS timestamp;',
-        'params': None
-    }
+    def server_timestamp():
+        text = 'RETURN datetime() AS timestamp;',
+        params = None
+        return text, params
     
-    labels = {
-        'text': 'CALL db.labels();',
-        'params': None
-     }
+    def labels():
+        text = 'CALL db.labels();'
+        params = None
+        return text, params
+    
+    def properties(label, node_limit=1000):
+        text = f"""
+            MATCH 
+                (n:{label}) 
+            WITH n 
+            LIMIT {node_limit} 
+            UNWIND keys(n) as key
+            RETURN DISTINCT key AS properties;
+        """
+        params = None
+        return text, params
     
 ###############################################################################
 # _Internal functions
@@ -129,10 +141,28 @@ def _get_db_labels():
     list(str):
         A list of Neo4j labels in use by the database.
     """
-    text = Queries.labels['text']
-    params = Queries.labels['params']
+    text, params = Queries.labels()
     results = _query(text, params)
     return list(map(lambda row: row['label'], results))
+
+def _get_properties(label):
+    """
+    Given a neo4j label, get the properties on that label.
+    Is it possible to return these as (name, type)?
+
+    Parameters
+    ----------
+    label: str
+        A neo4j label, without the :
+
+    Returns
+    -------
+    list(str):
+        A list of properties on this node.
+    """
+    text, params = Queries.properties(label)
+    results = _query(text, params)
+    return results[0]['properties']
 
 def _query(query_text=None, query_params=None):
     """

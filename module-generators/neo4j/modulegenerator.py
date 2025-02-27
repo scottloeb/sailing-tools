@@ -28,7 +28,7 @@ import inspect
 import neo4j
 from neo4j import GraphDatabase
 
-VERSION = '0.0.0'
+VERSION = (0,0,0)
 
 # Add the module generator to our PATH variable
 path = f'{sys.path[-1].split(".env")[0]}module-generators/neo4j'

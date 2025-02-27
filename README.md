@@ -12,13 +12,11 @@ A repository for various excursions into:
 Useful commands:
 
 Replace <DATA_DIRECTORY> with the path on your system where you want
-to persist data:
+to persist data.
 
-`LOCAL_VOLUME=<data directory here>`
-`NEO4J_VERSION=4.4.26`
-`podman run -dt --name=neo4jgarden4426 --env=NEO4J_AUTH=neo4j/neo4j-dev --env=dbms.db.timezone=SYSTEM --publish=7474:7474 --publish=7687:7687 --volume=$LOCAL_VOLUME:/data neo4j:<VERSION>`
+`podman run -p 7474:7474 -p 7687:7687 -v $LOCAL_VOLUME:/data --name=neo4j4426 -e NEO4J_AUTH=neo4j/neo4j-dev -e dbms.db.timezone=SYSTEM -e NEO4JLABS_PLUGINS=\[\"apoc\"\] neo4j:4.4.26 `
 
-Note: I am working with 4.4.26 right now to ensure backwards compatibility with another project.
+Note: I am working with 4.4.26 right now to ensure compatibility with another project.
 
 ## Useful Links
 Neo4j Python Driver 4.4 Documentation: https://neo4j.com/docs/api/python-driver/4.4/

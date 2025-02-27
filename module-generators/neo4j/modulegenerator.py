@@ -44,7 +44,7 @@ profile = {
 
 class Queries:
     def server_timestamp():
-        text = 'RETURN datetime() AS timestamp;',
+        text = 'RETURN datetime() AS timestamp;'
         params = None
         return text, params
     
@@ -59,8 +59,8 @@ class Queries:
                 (n:{label}) 
             WITH n 
             LIMIT {node_limit} 
-            UNWIND keys(n) as key
-            RETURN DISTINCT key AS properties;
+            UNWIND apoc.meta.cypher.types(n) AS props
+            RETURN collect(DISTINCT props) AS props;
         """
         params = None
         return text, params
@@ -128,7 +128,7 @@ def _authenticated_driver(uri=profile['uri'], username=profile['username'], pass
     """
     return GraphDatabase.driver(uri, auth=(username, password))
 
-def _get_db_labels():
+def _get_labels():
     """
     Returns a list of labels in use by the database.
 
@@ -145,7 +145,7 @@ def _get_db_labels():
     results = _query(text, params)
     return list(map(lambda row: row['label'], results))
 
-def _get_properties(label):
+def _get_props(label):
     """
     Given a neo4j label, get the properties on that label.
     Is it possible to return these as (name, type)?
@@ -162,7 +162,7 @@ def _get_properties(label):
     """
     text, params = Queries.properties(label)
     results = _query(text, params)
-    return results[0]['properties']
+    return results[0]['props']
 
 def _query(query_text=None, query_params=None):
     """
@@ -181,6 +181,16 @@ def _query(query_text=None, query_params=None):
     """
     with _authenticated_driver().session() as session:
         return session.run(query_text, query_params).data()
+    
+def _schema():
+    """
+    Compiles schema for the graph.
+
+    CURRENT: Nodes and their properties.
+    TODO: Edges and their properties
+    TODO: Edge types between node labels.
+    """
+    return dict(map(lambda e: (e, modulegenerator._get_props(e)), modulegenerator._get_labels()))
 
 def _server_timestamp():
     """

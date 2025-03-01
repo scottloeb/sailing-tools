@@ -53,16 +53,38 @@ class Queries:
         params = None
         return text, params
     
-    def properties(label, node_limit=1000):
+    def node_properties(label, limit=None):
         text = f"""
             MATCH 
                 (n:{label}) 
             WITH n 
-            LIMIT {node_limit} 
+            {f"LIMIT {limit}" if limit is not None else ""}
             UNWIND apoc.meta.cypher.types(n) AS props
             RETURN collect(DISTINCT props) AS props;
         """
         params = None
+        return text, params
+    
+    def relationship_types():
+        text = 'CALL db.relationshipTypes();'
+        params = None
+        return text, params
+    
+    def edge_properties(type, limit=1000):
+        text = f"""
+            MATCH
+                (a)-[e:{type}]->(b)
+            WITH a, e, b
+            {f"LIMIT {limit}" if limit is not None else ""}
+            UNWIND apoc.meta.cypher.types(e) AS props
+            UNWIND labels(a) AS startLabels
+            UNWIND labels(b) AS endLabels
+            RETURN 
+            collect(DISTINCT props) as props,
+            collect(DISTINCT startLabels) AS startLabels,
+            collect(DISTINCT endLabels) AS endLabels;
+        """
+        params = None 
         return text, params
     
 ###############################################################################
@@ -145,7 +167,24 @@ def _get_labels():
     results = _query(text, params)
     return list(map(lambda row: row['label'], results))
 
-def _get_props(label):
+def _get_relationship_types():
+    """
+    Returns a list of relationship types in use by the database.
+
+    Parameters
+    ----------
+    None
+
+    Returns
+    -------
+    list(str):
+        A list of Neo4j edge types in use by the database.
+    """
+    text, params = Queries.relationship_types()
+    results = _query(text, params)
+    return list(map(lambda row: row['relationshipType'], results))
+
+def _get_node_props(label):
     """
     Given a neo4j label, get the properties on that label.
     Is it possible to return these as (name, type)?
@@ -160,7 +199,7 @@ def _get_props(label):
     list(str):
         A list of properties on this node.
     """
-    text, params = Queries.properties(label)
+    text, params = Queries.node_properties(label)
     results = _query(text, params)
     return results[0]['props']
 
@@ -190,7 +229,7 @@ def _schema():
     TODO: Edges and their properties
     TODO: Edge types between node labels.
     """
-    return dict(map(lambda e: (e, modulegenerator._get_props(e)), modulegenerator._get_labels()))
+    return dict(map(lambda e: (e, modulegenerator._get_node_props(e)), modulegenerator._get_labels()))
 
 def _server_timestamp():
     """

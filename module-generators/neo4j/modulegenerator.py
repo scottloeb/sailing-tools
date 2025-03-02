@@ -49,7 +49,31 @@ class Queries:
         return text, params
     
     def node_labels():
-        text = 'CALL db.labels();'
+        text = 'CALL db.labels() YIELD label RETURN collect(label) AS labels;'
+        params = None
+        return text, params
+    
+    def node_type_properties():
+        text = f"""
+        CALL db.schema.nodeTypeProperties() YIELD nodeLabels, propertyName, propertyTypes
+        UNWIND nodeLabels AS nodeLabel
+        UNWIND propertyTypes AS propertyType
+        RETURN
+            DISTINCT nodeLabel,
+            propertyName,
+            collect(propertyType) AS propertyTypes;
+        """
+        params = None 
+        return text, params
+    
+    def rel_type_properties():
+        text = f"""
+        CALL db.schema.relTypeProperties() YIELD relType, propertyName, propertyTypes
+        UNWIND propertyTypes AS propertyType
+        RETURN
+            DISTINCT relType,
+            propertyName,
+            collect(propertyType) AS propertyTypes;"""
         params = None
         return text, params
     
@@ -66,7 +90,7 @@ class Queries:
         return text, params
     
     def edge_types():
-        text = 'CALL db.relationshipTypes();'
+        text = 'CALL db.relationshipTypes() YIELD relationshipType RETURN collect(relationshipType) AS relationshipTypes;'
         params = None
         return text, params
     
@@ -77,6 +101,19 @@ class Queries:
             {f"LIMIT {limit}" if limit is not None else ""}
             UNWIND apoc.meta.cypher.types(e) AS props
             RETURN collect(DISTINCT props) as props;
+        """
+        params = None 
+        return text, params
+    
+    def edge_endpoints(type, limit=1000):
+        text = f"""
+            MATCH (a)-[e:{type}]->(b)
+            WITH a, e, b
+            {f"LIMIT {limit}" if limit is not None else ""}
+            UNWIND labels(a) AS startLabel
+            UNWIND labels(b) AS endLabel
+            RETURN collect(DISTINCT startLabel) AS startLabels,
+            collect(DISTINCT endLabel) AS endLabels;
         """
         params = None 
         return text, params
@@ -159,7 +196,7 @@ def _get_node_labels():
     """
     text, params = Queries.node_labels()
     results = _query(text, params)
-    return list(map(lambda row: row['label'], results))
+    return results[0]['labels']
 
 def _get_edge_types():
     """
@@ -178,41 +215,55 @@ def _get_edge_types():
     results = _query(text, params)
     return list(map(lambda row: row['relationshipType'], results))
 
-def _get_node_props(label):
+def _get_node_type_properties():
     """
-    Given a neo4j label, get the properties on that label.
+    Uses db.schema.nodeTypeProperties() to compile metadata.
 
     Parameters
     ----------
-    label: str
-        A neo4j node label
+    None
 
     Returns
     -------
-    list(str):
-        A list of properties on this node.
+    A dictionary containing metadata about nodes.
     """
-    text, params = Queries.node_properties(label)
+    text, params = Queries.node_type_properties()
     results = _query(text, params)
-    return results[0]['props']
+    metadata = dict()
+    for result in results: 
+        metadata[result['nodeLabel']] = {'propertyName': result['propertyName'], 'propertyType':result['propertyTypes']}
+    return metadata
 
-def _get_edge_props(type):
+def _get_edge_type_properties():
     """
-    Given a neo4j edge type, get the properties on edges with that type.
+    Uses db.schema.relTypeProperties() to compile metadata.
 
     Parameters
     ----------
-    type: str
-        A neo4j edge type
+    None
 
     Returns
     -------
-    list(str):
-        A list of properties on this node.
+    dict()
+        Keys are edge types, values are lists of dictionaries:
+        propertyName: the name of the property on the edge
+        propertyTypes: any neo4j types associated with this property
     """
-    text, params = Queries.edge_properties(type)
+    text, params = Queries.rel_type_properties()
     results = _query(text, params)
-    return results[0]['props']
+    metadata = dict()
+    for result in results:
+        metadata[result['relType'].strip(':').strip('`')] = { 'propertyName': result['propertyName'], 'propertyTypes': result['propertyTypes']}
+    return metadata
+
+def _get_edge_endpoints(type):
+    """
+    Returns a list of endpoint labels for the given type.
+    
+    """
+    text, params = Queries.edge_endpoints(type)
+    results = _query(text, params)
+    return results[0]
 
 def _query(query_text=None, query_params=None):
     """

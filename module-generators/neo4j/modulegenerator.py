@@ -48,7 +48,7 @@ class Queries:
         params = None
         return text, params
     
-    def labels():
+    def node_labels():
         text = 'CALL db.labels();'
         params = None
         return text, params
@@ -65,24 +65,18 @@ class Queries:
         params = None
         return text, params
     
-    def relationship_types():
+    def edge_types():
         text = 'CALL db.relationshipTypes();'
         params = None
         return text, params
     
     def edge_properties(type, limit=1000):
         text = f"""
-            MATCH
-                (a)-[e:{type}]->(b)
+            MATCH (a)-[e:{type}]->(b)
             WITH a, e, b
             {f"LIMIT {limit}" if limit is not None else ""}
             UNWIND apoc.meta.cypher.types(e) AS props
-            UNWIND labels(a) AS startLabels
-            UNWIND labels(b) AS endLabels
-            RETURN 
-            collect(DISTINCT props) as props,
-            collect(DISTINCT startLabels) AS startLabels,
-            collect(DISTINCT endLabels) AS endLabels;
+            RETURN collect(DISTINCT props) as props;
         """
         params = None 
         return text, params
@@ -150,7 +144,7 @@ def _authenticated_driver(uri=profile['uri'], username=profile['username'], pass
     """
     return GraphDatabase.driver(uri, auth=(username, password))
 
-def _get_labels():
+def _get_node_labels():
     """
     Returns a list of labels in use by the database.
 
@@ -163,11 +157,11 @@ def _get_labels():
     list(str):
         A list of Neo4j labels in use by the database.
     """
-    text, params = Queries.labels()
+    text, params = Queries.node_labels()
     results = _query(text, params)
     return list(map(lambda row: row['label'], results))
 
-def _get_relationship_types():
+def _get_edge_types():
     """
     Returns a list of relationship types in use by the database.
 
@@ -180,19 +174,18 @@ def _get_relationship_types():
     list(str):
         A list of Neo4j edge types in use by the database.
     """
-    text, params = Queries.relationship_types()
+    text, params = Queries.edge_types()
     results = _query(text, params)
     return list(map(lambda row: row['relationshipType'], results))
 
 def _get_node_props(label):
     """
     Given a neo4j label, get the properties on that label.
-    Is it possible to return these as (name, type)?
 
     Parameters
     ----------
     label: str
-        A neo4j label, without the :
+        A neo4j node label
 
     Returns
     -------
@@ -200,6 +193,24 @@ def _get_node_props(label):
         A list of properties on this node.
     """
     text, params = Queries.node_properties(label)
+    results = _query(text, params)
+    return results[0]['props']
+
+def _get_edge_props(type):
+    """
+    Given a neo4j edge type, get the properties on edges with that type.
+
+    Parameters
+    ----------
+    type: str
+        A neo4j edge type
+
+    Returns
+    -------
+    list(str):
+        A list of properties on this node.
+    """
+    text, params = Queries.edge_properties(type)
     results = _query(text, params)
     return results[0]['props']
 
@@ -229,7 +240,7 @@ def _schema():
     TODO: Edges and their properties
     TODO: Edge types between node labels.
     """
-    return dict(map(lambda e: (e, modulegenerator._get_node_props(e)), modulegenerator._get_labels()))
+    return dict(map(lambda e: (e, modulegenerator._get_node_props(e)), modulegenerator._get_node_labels()))
 
 def _server_timestamp():
     """

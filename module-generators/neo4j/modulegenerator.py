@@ -110,10 +110,7 @@ class Queries:
             MATCH (a)-[e:{type}]->(b)
             WITH a, e, b
             {f"LIMIT {limit}" if limit is not None else ""}
-            UNWIND labels(a) AS startLabel
-            UNWIND labels(b) AS endLabel
-            RETURN collect(DISTINCT startLabel) AS startLabels,
-            collect(DISTINCT endLabel) AS endLabels;
+            RETURN DISTINCT labels(a) AS startLabels, labels(b) AS endLabels;
         """
         params = None 
         return text, params
@@ -213,7 +210,7 @@ def _get_edge_types():
     """
     text, params = Queries.edge_types()
     results = _query(text, params)
-    return list(map(lambda row: row['relationshipType'], results))
+    return results[0]['relationshipTypes']
 
 def _get_node_type_properties():
     """
@@ -262,8 +259,8 @@ def _get_edge_endpoints(type):
     
     """
     text, params = Queries.edge_endpoints(type)
-    results = _query(text, params)
-    return results[0]
+    results = _query(text, params)[0]
+    return results['startLabels'], results['endLabels']
 
 def _query(query_text=None, query_params=None):
     """

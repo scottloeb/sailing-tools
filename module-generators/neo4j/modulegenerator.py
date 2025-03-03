@@ -42,11 +42,35 @@ profile = {
     'password':'neo4j-dev'
 }
 
+metadata = dict()
+
 class Queries:
     def server_timestamp():
         text = 'RETURN datetime() AS timestamp;'
         params = None
         return text, params
+    
+    def node(label, **props):
+        """
+        Node interface cypher -- given a neo4j label (can be a multi-
+        label separated by colons, e.g., Label1:Label2) and a dictionary
+        of propNames and propValues, construct a parameterized Cypher query 
+        to return a list of nodes with that label matching those properties.
+        As of this version (3/3/25), there is no type checking -- all
+        properties are converted to Strings for ease of development.
+        We will use the metadata object to validate search terms.
+        """
+        # Unpack individual props
+        print(props)
+        
+        text = f"""MATCH 
+            (n:{label} 
+            {'' if props is None else '{'} 
+            {','.join(f"{prop}: ${prop}" for prop in props)}
+            {'}' if props is None else '}'}) 
+            RETURN n;"""
+
+        return text, props
     
     def node_labels():
         text = 'CALL db.labels() YIELD label RETURN collect(label) AS labels;'
@@ -116,7 +140,7 @@ class Queries:
         return text, params
     
 ###############################################################################
-# _Internal functions
+# _internal functions
 # These make the public functions work. While they can be called directly,
 # they are not designed for that use and may not be as easy to work with as
 # the public functions.
@@ -178,22 +202,21 @@ def _authenticated_driver(uri=profile['uri'], username=profile['username'], pass
     """
     return GraphDatabase.driver(uri, auth=(username, password))
 
-def _get_node_labels():
-    """
-    Returns a list of labels in use by the database.
+###############################################################################
+# _schema calls
+# These make the public functions work. While they can be called directly,
+# they are not designed for that use and may not be as easy to work with as
+# the public functions.
+###############################################################################
 
-    Parameters
-    ----------
-    None
-
-    Returns
-    -------
-    list(str):
-        A list of Neo4j labels in use by the database.
+def _get_edge_endpoints(type):
     """
-    text, params = Queries.node_labels()
-    results = _query(text, params)
-    return results[0]['labels']
+    Returns a list of endpoint labels for the given type.
+    
+    """
+    text, params = Queries.edge_endpoints(type)
+    results = _query(text, params)[0]
+    return results['startLabels'], results['endLabels']
 
 def _get_edge_types():
     """
@@ -212,25 +235,6 @@ def _get_edge_types():
     results = _query(text, params)
     return results[0]['relationshipTypes']
 
-def _get_node_type_properties():
-    """
-    Uses db.schema.nodeTypeProperties() to compile metadata.
-
-    Parameters
-    ----------
-    None
-
-    Returns
-    -------
-    A dictionary containing metadata about nodes.
-    """
-    text, params = Queries.node_type_properties()
-    results = _query(text, params)
-    metadata = dict()
-    for result in results: 
-        metadata[result['nodeLabel']] = {'propertyName': result['propertyName'], 'propertyType':result['propertyTypes']}
-    return metadata
-
 def _get_edge_type_properties():
     """
     Uses db.schema.relTypeProperties() to compile metadata.
@@ -248,19 +252,64 @@ def _get_edge_type_properties():
     """
     text, params = Queries.rel_type_properties()
     results = _query(text, params)
-    metadata = dict()
+    props = dict()
     for result in results:
-        metadata[result['relType'].strip(':').strip('`')] = { 'propertyName': result['propertyName'], 'propertyTypes': result['propertyTypes']}
-    return metadata
+        props[result['relType'].strip(':').strip('`')] = { 'propertyName': result['propertyName'], 'propertyTypes': result['propertyTypes']}
+    return props
 
-def _get_edge_endpoints(type):
+def _get_node(label, **props):
     """
-    Returns a list of endpoint labels for the given type.
-    
+    Searches for specific ndoes in the database by label and property value.
+
+    Parameters
+    ----------
+    label: str
+        A neo4j label (may be a multilabel, separated by colons)
+    props: dict
+        Optional key-value pairs for property searches. If none are
+        provided, all nodes with the given label are returned.
     """
-    text, params = Queries.edge_endpoints(type)
-    results = _query(text, params)[0]
-    return results['startLabels'], results['endLabels']
+    text, params = Queries.node(label=label, **props)
+    print('text:', text)
+    print('params:', params)
+    results = _query(text, params)
+    return list(map(lambda result: result['n'], results))
+
+def _get_node_labels():
+    """
+    Returns a list of labels in use by the database.
+
+    Parameters
+    ----------
+    None
+
+    Returns
+    -------
+    list(str):
+        A list of Neo4j labels in use by the database.
+    """
+    text, params = Queries.node_labels()
+    results = _query(text, params)
+    return results[0]['labels']
+
+def _get_node_type_properties():
+    """
+    Uses db.schema.nodeTypeProperties() to compile metadata.
+
+    Parameters
+    ----------
+    None
+
+    Returns
+    -------
+    A dictionary containing metadata about nodes.
+    """
+    text, params = Queries.node_type_properties()
+    results = _query(text, params)
+    props = dict()
+    for result in results: 
+        props[result['nodeLabel']] = {'propertyName': result['propertyName'], 'propertyType':result['propertyTypes']}
+    return props
 
 def _query(query_text=None, query_params=None):
     """
@@ -279,16 +328,6 @@ def _query(query_text=None, query_params=None):
     """
     with _authenticated_driver().session() as session:
         return session.run(query_text, query_params).data()
-    
-def _schema():
-    """
-    Compiles schema for the graph.
-
-    CURRENT: Nodes and their properties.
-    TODO: Edges and their properties
-    TODO: Edge types between node labels.
-    """
-    return dict(map(lambda e: (e, modulegenerator._get_node_props(e)), modulegenerator._get_node_labels()))
 
 def _server_timestamp():
     """
@@ -310,6 +349,8 @@ def _server_timestamp():
 
 ###############################################################################
 # Public functions
+# The purpose of this module is to expose the generate_module function.
+# As of right now (3/3/25), it is the only public function.
 ###############################################################################
 
 def generate_module(uri=None, username=None, password=None, graph=None, output_directory=os.environ['PWD']):
@@ -357,6 +398,9 @@ def generate_module(uri=None, username=None, password=None, graph=None, output_d
     _append(filename, f"# Generated with neo4j driver version {neo4j.__version__}")
 
     _log('Appending imports to module')
+    for python_module in ['neo4j']:
+        _append(filename, f'import {python_module}')
+
     _append_imports(filename, imports=['neo4j'])
     _append(filename, 'from neo4j import GraphDatabase\n')
 

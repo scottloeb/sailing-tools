@@ -11786,7 +11786,7 @@ CREATE (f)-[:LABORATORY_SERVICES_FOR {
     release_print_order: 600,
     print_quality_control: 'Individual inspection of first 50 prints',
     archival_elements_created: 'Preservation YCM separations created',
-    lab-studio_relationship: 'Long-standing Paramount account',
+    `lab-studio_relationship`: 'Long-standing Paramount account',
     processing_schedule: 'Dailies priority scheduling',
     confidentiality_protocols: 'Special security for high-profile production',
     technical_documentation: 'Comprehensive timing records preserved'

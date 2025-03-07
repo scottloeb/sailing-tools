@@ -378,3 +378,9 @@ This project demonstrates the potential of human-AI collaboration in making tech
 If you're new to graph databases or Python, don't hesitate to give this a try. It's designed specifically to help you get started without getting overwhelmed. And if you have questions, feel free to open an issue in the repository.
 
 Happy coding! 🚀
+
+# NOTE FROM DAN HALES: 
+
+The full interaction with claude.ai is public. I enjoyed this, and I hope you will, too.
+
+ https://claude.ai/share/b8ee67e9-5949-4cc8-a01d-3725fb8ef811

@@ -1,109 +1,63 @@
-# G.A.R.D.E.N.
-## Graph Algorithms, Research, Development, Enhancement, and Novelties
+# G.A.R.D.E.N. (Graph Algorithms, Research, Development, Enhancement, and Novelties)
 
-### Project Overview
+G.A.R.D.E.N. is an open-source initiative focused on creating accessible, Python-based graph data applications for everyone. This project leverages the Module Generator to rapidly develop intuitive interfaces to graph databases, transforming complex network data into approachable, usable tools.
 
-G.A.R.D.E.N. is an open-source portfolio demonstrating advanced prompt engineering techniques through collaboration with Claude.ai. The repository serves as a showcase of graph database capabilities, novel visualizations, and educational tools—with Claude.ai generating the majority of the codebase through iterative prompt refinement.
+Our philosophy centers on making graph data accessible without requiring extensive knowledge of graph databases or query languages. Each application in the G.A.R.D.E.N. ecosystem is designed to expose different interaction patterns with graph data while maintaining simplicity and usability.
 
-### Collaborative Process with Claude.ai
+## Core Applications
 
-This project explicitly embraces a human-AI collaborative development approach:
+### 🌱 Grassroots
 
-1. **AI-Generated Development**: Claude.ai generates the majority of code, documentation, and technical assets based on your prompts.
+Grassroots implements a "metadata-first" approach to graph exploration. It begins with the schema and works its way to the data, making it ideal for users who understand their business domain but may not know specific data points.
 
-2. **Prompt Engineering Portfolio**: The repository serves as a demonstration of effective prompt engineering rather than traditional software engineering skills.
+This Flask API exposes schema information through simple endpoints. By following schema information, users discover data that matches specific patterns. The interface features a clean, hyperlink-based UI without complex visualizations.
 
-3. **Iterative Refinement Cycle**:
-   - You provide initial concept prompts
-   - Claude.ai generates complete code implementations
-   - You review and request specific refinements
-   - Claude.ai implements requested changes
-   - This cycle continues until desired functionality is achieved
+The Module Generator accelerates development by creating intuitive connections between URLs (containing labels) and the underlying Python functions. Users explore entities by examining schema information, sorting by properties, and browsing ordered lists – offering an alternative to property-based search.
 
-4. **Educational Transparency**: Each interaction includes Claude.ai's explanations of underlying concepts, algorithms, and implementation decisions.
+### 🦗 Grasshopper
 
-5. **Deep Learning Through Inquiry**: You engage in Cognitive Level 6 questioning to explore theoretical foundations and practical implications.
+Grasshopper takes a "data-first" approach to graph exploration. Users begin with a curated list of high-value entities and navigate through the graph by "hopping" between connected nodes.
 
-6. **Documented Prompting Strategies**: The repository includes the prompts used to generate each component, serving as educational examples for other prompt engineers.
+Each entity has a simplified profile page showing all properties and connected nodes. Navigation happens through hyperlinks rather than visualizations. This approach creates an intuitive browsing experience similar to exploring Wikipedia, where each click reveals new connections.
 
-## Repository Structure
+Grasshopper excels at providing contextual understanding of relationships and allowing serendipitous discovery through graph traversal.
 
-### Code Organization
+### 🌻 Sunflower
 
-1. **Code Assets**:
-   - All major code components are Claude.ai-generated
-   - Each component includes attribution indicating it was created through AI collaboration
-   - Commit history reflects the iterative prompt-response cycle
+Sunflower offers a "pattern-first" approach to graph exploration, focusing on revealing common relationship patterns within your data. This application automatically identifies and categorizes recurring structural patterns (like cycles, stars, or chains) that may have business significance.
 
-2. **Prompt Documentation**:
-   - Each code module includes the original prompts that generated it
-   - Prompt refinements are documented to show the evolution of requirements
+Users begin by selecting a pattern type from a categorized list. Sunflower then displays all instances of that pattern in the database, allowing users to browse examples and understand how entities commonly relate to one another. Each pattern instance can be explored in detail through hyperlinked entity profiles.
 
-3. **Learning Journey**:
-   - Areas of confusion and their resolutions are explicitly documented
-   - Technical explanations from Claude.ai are preserved alongside code
-
-## Repository Management Approach
-
-### Documentation Standards
-
-1. **Prompt Engineering Documentation**:
-   - Include all significant prompts used to generate code
-   - Document prompt strategies, patterns, and lessons learned
-   - Analyze what worked and what required refinement
-
-2. **AI Collaboration Transparency**:
-   - Clearly indicate Claude.ai's role in generating content
-   - Document the collaborative process and decision points
-
-3. **Educational Value**:
-   - Preserve detailed explanations provided by Claude.ai
-   - Include concept breakdowns alongside technical implementations
-
-### Contribution Guidelines
-
-1. **Prompt-First Development**:
-   - New features begin with crafting effective prompts
-   - Changes to existing code are implemented by prompting Claude.ai with specific requirements
-
-2. **Versioned Prompts**:
-   - Maintain version history of prompts alongside code
-   - Document how prompt refinements led to code improvements
-
-3. **Evaluation Metrics**:
-   - Assess and document prompt effectiveness
-   - Track iterations required to achieve desired outcomes
-
-### Repository Organization
-
-1. **Project Structure**:
-   - `/prompts`: Directory containing all prompts used in development
-   - `/code`: Claude.ai-generated implementations
-   - `/explanations`: Detailed concept explanations from Claude.ai
-   - `/iterations`: Documentation of the refinement process
-
-2. **README Standards**:
-   - Each component includes its generating prompts
-   - Documentation emphasizes the prompt engineering process
-
-## Ethical Considerations and Disclaimers
-
-1. **Attribution**:
-   - Clear acknowledgment of Claude.ai's role in generating code
-   - Transparent documentation of the human-AI collaboration process
-
-2. **License Considerations**:
-   - Selection of appropriate licensing that acknowledges AI-generated content
-   - Documentation of any limitations or considerations for AI-generated code
-
-3. **Educational Purpose**:
-   - Explicit framing of the repository as an educational resource
-   - Focus on teaching graph concepts and prompt engineering techniques
+This approach excels at revealing hidden structural patterns that might indicate important business rules, constraints, or opportunities – all without requiring complex queries or visualizations.
 
 ## Getting Started
 
-This repository demonstrates how effective prompt engineering can produce sophisticated graph database tools and educational resources. Developers interested in prompt engineering, graph databases, or AI collaboration are encouraged to explore both the resulting code and the prompts that generated it.
+To begin exploring the G.A.R.D.E.N. ecosystem, start with our [Prerequisites notebook](https://github.com/danhales/garden/blob/main/generated/notebook-0-prerequisites.md). This introduction covers the fundamental concepts needed to understand and extend the applications in this repository.
 
----
+## How G.A.R.D.E.N. Applications Accelerate Data Exposure
 
-This README establishes G.A.R.D.E.N. as a prompt engineering portfolio that leverages Claude.ai's capabilities to create valuable graph database tools and educational resources. It emphasizes transparency about the AI-human collaboration process while highlighting the educational value for both graph database concepts and prompt engineering techniques.
+All G.A.R.D.E.N. applications are built using the Module Generator, which automatically creates type-safe Python interfaces for Neo4j databases. This approach offers several advantages:
+
+1. **Rapid Development**: Applications can be developed in days rather than weeks by leveraging auto-generated database interfaces.
+
+2. **Consistent Patterns**: All applications share consistent interaction patterns, reducing the learning curve for users and developers.
+
+3. **Extensibility**: The modular architecture makes it easy to enhance applications with new features while maintaining a solid foundation.
+
+## Use Cases
+
+G.A.R.D.E.N. applications can be adapted for numerous domains:
+
+- **Government Data Transparency**: Create public-facing portals for exploring relationships between policies, programs, and outcomes.
+
+- **Research Data Exploration**: Help researchers discover unexpected connections between entities in scientific datasets.
+
+- **Enterprise Knowledge Management**: Build internal tools for navigating organizational knowledge and relationships.
+
+- **Educational Tools**: Create interactive environments for students to explore complex domains through their relationship structures.
+
+## Contributing
+
+We welcome contributions of all kinds, from bug fixes to entirely new "garden" applications. If you're interested in contributing, please review our contribution guidelines and code of conduct.
+
+The G.A.R.D.E.N. project aims to make graph data accessible to everyone through simple, intuitive interfaces. Join us in growing this ecosystem of tools for graph exploration and discovery!

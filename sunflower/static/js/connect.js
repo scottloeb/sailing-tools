@@ -26,22 +26,26 @@ document.addEventListener('DOMContentLoaded', function() {
             if (data.success) {
                 // Connection successful
                 connectionStatus.className = 'success';
-                connectionStatus.textContent = 'Connection successful!';
+                connectionStatus.textContent = 'Connection successful! Redirecting to dashboard...';
                 
-                // Redirect after a short delay
+                // Redirect to the dashboard after a short delay
                 setTimeout(() => {
-                    window.location.href = '/';
-                }, 2000);
+                    window.location.href = data.redirect_url || '/dashboard';
+                }, 1500);
             } else {
                 // Connection failed
                 connectionStatus.className = 'error';
                 connectionStatus.textContent = 'Connection failed: ' + data.message;
+                
+                // Log more details to the console for debugging
+                console.error('Connection error:', data.message);
             }
         })
         .catch(error => {
             // Error in the request
             connectionStatus.className = 'error';
             connectionStatus.textContent = 'Error: ' + error.message;
+            console.error('Fetch error:', error);
         });
     });
 });

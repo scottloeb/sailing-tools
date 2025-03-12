@@ -13,7 +13,7 @@ from flask import Flask, render_template, request, jsonify, redirect, url_for, s
 
 # Add the module-generators/neo4j directory to the path
 parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-module_dir = os.path.join(parent_dir, 'module-generators', 'neo4j')
+module_dir = os.path.join(parent_dir, 'generated')
 sys.path.append(module_dir)
 
 # Add PWD environment variable for Windows compatibility
@@ -38,7 +38,7 @@ try:
     # First make sure neo4j is installed
     import neo4j
     # Then import the generator
-    from modulegenerator import generate_module
+    from modulegenerator_claude import generate_module
     print("Successfully imported Module Generator")
     module_generator_available = True
 except ImportError as e:

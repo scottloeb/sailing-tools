@@ -13,7 +13,7 @@ from flask import Flask, render_template, request, jsonify, redirect, url_for, s
 
 # Add the module-generators/neo4j directory to the path
 parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-module_dir = os.path.join(parent_dir, 'module-generators', 'neo4j')
+module_dir = os.path.join(parent_dir, 'generated')
 sys.path.append(module_dir)
 
 # Add PWD environment variable for Windows compatibility
@@ -38,7 +38,7 @@ try:
     # First make sure neo4j is installed
     import neo4j
     # Then import the generator
-    from modulegenerator import generate_module
+    from modulegenerator_claude import generate_module
     print("Successfully imported Module Generator")
     module_generator_available = True
 except ImportError as e:
@@ -311,6 +311,88 @@ def api_graph_data():
         import traceback
         traceback.print_exc()
         return jsonify({'success': False, 'message': f'Error getting graph data: {str(e)}'})
+        
+@app.route('/patterns')
+def patterns():
+    """Display the pattern catalog"""
+    connection_details = session.get('connection_details')
+    
+    if not connection_details:
+        return redirect(url_for('connect'))
+    
+    # Use cached patterns if available
+    if 'patterns' not in session or request.args.get('refresh') == 'true':
+        from utils.pattern_detector import PatternDetector
+        
+        detector = PatternDetector(
+            connection_details['uri'],
+            connection_details['username'],
+            connection_details['password']
+        )
+        
+        try:
+            patterns = detector.detect_all_patterns()
+            session['patterns'] = patterns
+        except Exception as e:
+            print(f"Error detecting patterns: {str(e)}")
+            return render_template(
+                'error.html', 
+                title="Error", 
+                message=f"Error detecting patterns: {str(e)}"
+            )
+        finally:
+            detector.close()
+    else:
+        patterns = session['patterns']
+    
+    return render_template(
+        'patterns.html',
+        title="Sunflower - Pattern Explorer",
+        connection=connection_details['uri'],
+        patterns=patterns
+    )
+
+@app.route('/patterns/<pattern_id>')
+def pattern_detail(pattern_id):
+    """Show details for a specific pattern"""
+    connection_details = session.get('connection_details')
+    
+    if not connection_details or 'patterns' not in session:
+        return redirect(url_for('patterns'))
+    
+    patterns = session.get('patterns', {})
+    
+    if pattern_id not in patterns:
+        return redirect(url_for('patterns'))
+    
+    return render_template(
+        'pattern_detail.html',
+        title=f"Sunflower - {patterns[pattern_id]['name']}",
+        pattern_id=pattern_id,
+        pattern=patterns[pattern_id]
+    )
+
+@app.route('/api/pattern/<pattern_id>/<instance_id>')
+def api_pattern_visualization(pattern_id, instance_id):
+    """Get visualization data for a specific pattern instance"""
+    connection_details = session.get('connection_details')
+    
+    if not connection_details:
+        return jsonify({'success': False, 'message': 'No active connection'})
+    
+    from utils.pattern_detector import PatternDetector
+    
+    detector = PatternDetector(
+        connection_details['uri'],
+        connection_details['username'],
+        connection_details['password']
+    )
+    
+    try:
+        result = detector.get_pattern_visualization_data(pattern_id, instance_id)
+        return jsonify(result)
+    finally:
+        detector.close()
 
 # API to get database info
 @app.route('/api/database_info')

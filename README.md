@@ -48,7 +48,7 @@ This approach excels at revealing hidden structural patterns that might indicate
 
 ## Getting Started
 
-To begin exploring the G.A.R.D.E.N. ecosystem, start with our [Prerequisites notebook](https://github.com/danhales/garden/blob/main/generated/notebook-0-prerequisites.md). This introduction covers the fundamental concepts needed to understand and extend the applications in this repository.
+To begin exploring the G.A.R.D.E.N. ecosystem, start with our [Prerequisites notebook](https://github.com/danhales/garden/blob/main/generated/modulegenerator_v1/notebook-0-prerequisites.md). This introduction covers the fundamental concepts needed to understand and extend the applications in this repository.
 
 ## How G.A.R.D.E.N. Applications Accelerate Data Exposure
 

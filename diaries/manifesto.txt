@@ -2,8 +2,9 @@
 
 Hi, my name is Dan Hales, and I uh, guess I created a thing, so now it's
 up to me to put bounds on it and make it palatable for the world to
-understand. This README, and everything in the /man directory, is hand-
-written.
+understand. This manifesto, and everything starting with "man" that has
+a "gen" counterpart, is handwritten. The genifesto, and each "gen" with
+a "man" counterpart, is the result of a prompt.
 
 Artificial Intelligence scares me. And because it scares me, I feel like
 I need to do something about it. My approach is to fear monger a little

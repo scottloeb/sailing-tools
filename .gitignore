@@ -87,6 +87,7 @@ Icon*
 
 # Temporary Google Drive files during sync
 .drive.tmp.*
+.tmp.driveupload/*
 
 # Google Drive folder config
 *.icloud

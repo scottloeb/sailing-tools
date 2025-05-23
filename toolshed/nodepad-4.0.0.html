@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>NodePad 4.0.0</title>
+</head>
+<body>
+    <div id="app"></div>
+    
+    <script>
+    /**
+     * NodePad 4.0.0 - DOM-as-Truth Architecture
+     * A spatial note-taking tool where focus never leaves your notes
+     */
+    
+    // Simple console logger
+    const Logger = {
+        log: (action, data = {}) => {
+            console.log(`%c NodePad %c ${action}`, 
+                'background:#4a6fa5;color:white;padding:2px 4px;border-radius:2px', 
+                'color:#333', data);
+        },
+        
+        init: () => {
+            console.log(`%c NodePad 4.0.0 %c Ready`, 
+                'background:#4a6fa5;color:white;padding:4px 8px;border-radius:4px;font-size:14px', 
+                'color:#333;font-size:14px');
+            console.log(`%c Keyboard Shortcuts:
+- Alt+N: New node
+- Alt+D: Delete node
+- Tab: Navigate to buttons
+- Enter: Create child (when on button)
+- Ctrl+Enter: Save`, 
+                'color:#666;font-size:12px');
+        }
+    };
+    
+    // Main API
+    const NodePadAPI = {
+        // Create a node element
+        createNode: function(options = {}) {
+            const { id, x = 50, y = 50, emoji = '✏️', content = '', parentId = null } = options;
+            const nodeId = id || `node-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+            
+            return `
+                <div id="${nodeId}" 
+                     class="nodepad-node"
+                     data-emoji="${emoji}"
+                     data-content="${this.escapeHtml(content)}"
+                     ${parentId ? `data-parent-id="${parentId}"` : ''}
+                     style="position: absolute;
+                            left: ${x}%;
+                            top: ${y}%;
+                            width: 50px;
+                            height: 50px;
+                            border-radius: 50%;
+                            background: white;
+                            border: 1px solid #e0e0e0;
+                            cursor: pointer;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            transform: translate(-50%, -50%);
+                            z-index: 20;
+                            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+                            transition: transform 0.1s ease, border-color 0.2s ease;">
+                    <div class="node-emoji" style="font-size: 24px; user-select: none; pointer-events: none;">${emoji}</div>
+                </div>
+            `;
+        },
+        
+        // Create a connection between two nodes
+        createConnection: function(fromId, toId) {
+            const connId = `conn-${fromId}-${toId}`;
+            return `
+                <svg id="${connId}"
+                     class="nodepad-connection" 
+                     data-from="${fromId}" 
+                     data-to="${toId}"
+                     style="position: absolute;
+                            pointer-events: none;
+                            z-index: 10;
+                            overflow: visible;">
+                    <line x1="0" y1="0" x2="100" y2="100" 
+                          stroke="#cccccc" 
+                          stroke-width="2"/>
+                </svg>
+            `;
+        },
+        
+        // Create the editor panel
+        createEditor: function() {
+            return `
+                <div id="nodepad-editor"
+                     style="flex: 1;
+                            display: flex;
+                            flex-direction: column;
+                            background: white;
+                            border-left: 1px solid #e0e0e0;
+                            position: relative;">
+                    <div style="display: flex;
+                                align-items: center;
+                                padding: 16px;
+                                border-bottom: 1px solid #e0e0e0;">
+                        <div id="editor-emoji"
+                             contenteditable="true"
+                             tabindex="0"
+                             style="font-size: 24px;
+                                    padding: 4px;
+                                    border-radius: 4px;
+                                    cursor: pointer;
+                                    outline: none;
+                                    margin-right: 8px;">✏️</div>
+                        <div id="emoji-picker"
+                             style="display: none;
+                                    position: absolute;
+                                    top: 60px;
+                                    left: 16px;
+                                    background: white;
+                                    border: 1px solid #e0e0e0;
+                                    border-radius: 4px;
+                                    padding: 8px;
+                                    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+                                    z-index: 1000;">
+                            ${this.createEmojiPicker()}
+                        </div>
+                        <div id="save-status"
+                             style="font-size: 14px;
+                                    color: #666;
+                                    margin-left: 8px;
+                                    opacity: 0;
+                                    transition: opacity 0.3s;">Saved</div>
+                    </div>
+                    <div id="editor-content"
+                         contenteditable="true"
+                         tabindex="0"
+                         style="flex: 1;
+                                padding: 16px;
+                                outline: none;
+                                font-size: 16px;
+                                line-height: 1.6;
+                                font-family: inherit;
+                                border-left: 3px solid transparent;
+                                transition: border-color 0.2s;"
+                         data-placeholder="Start typing... (Alt+N for new node)"></div>
+                    <div id="editor-navigation"
+                         style="padding: 16px;
+                                border-top: 1px solid #e0e0e0;
+                                display: flex;
+                                justify-content: space-between;
+                                align-items: center;">
+                        <div id="parent-nav" style="flex: 1;"></div>
+                        <div id="children-nav" style="flex: 2; display: flex; justify-content: center; gap: 8px;"></div>
+                        <div style="flex: 1; display: flex; justify-content: flex-end; gap: 10px;">
+                            <div id="add-node-btn"
+                                 tabindex="0"
+                                 style="width: 36px;
+                                        height: 36px;
+                                        background: #4a6fa5;
+                                        color: white;
+                                        display: flex;
+                                        align-items: center;
+                                        justify-content: center;
+                                        border-radius: 4px;
+                                        cursor: pointer;
+                                        font-size: 22px;">+</div>
+                            <div id="delete-node-btn"
+                                 tabindex="0"
+                                 style="width: 36px;
+                                        height: 36px;
+                                        background: rgba(255,59,48,0.1);
+                                        color: #ff3b30;
+                                        border: 1px solid #ff3b30;
+                                        display: flex;
+                                        align-items: center;
+                                        justify-content: center;
+                                        border-radius: 4px;
+                                        cursor: pointer;
+                                        font-size: 22px;">−</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        },
+        
+        // Create emoji picker content
+        createEmojiPicker: function() {
+            const categories = {
+                'Growth': ['🌱', '🪴', '🌿', '🌳', '🍃', '🍂'],
+                'Project': ['✏️', '📋', '📝', '🛠️', '✅'],
+                'Learning': ['🔍', '📚', '🧠', '🎓'],
+                'Creative': ['💡', '🎨', '🖼️']
+            };
+            
+            let html = '';
+            for (const [category, emojis] of Object.entries(categories)) {
+                html += `<div style="margin-bottom: 8px;">
+                    <div style="font-size: 12px; color: #666; margin-bottom: 4px;">${category}</div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 4px;">`;
+                for (const emoji of emojis) {
+                    html += `<span class="emoji-option" 
+                                   style="padding: 4px; 
+                                          cursor: pointer; 
+                                          font-size: 18px;
+                                          border-radius: 4px;
+                                          transition: background 0.2s;"
+                                   data-emoji="${emoji}">${emoji}</span>`;
+                }
+                html += `</div></div>`;
+            }
+            return html;
+        },
+        
+        // Create canvas area
+        createCanvas: function() {
+            return `
+                <div id="nodepad-canvas"
+                     style="flex: 2;
+                            position: relative;
+                            background: #fafafa;
+                            overflow: hidden;">
+                    <div id="connections-layer"
+                         style="position: absolute;
+                                top: 0;
+                                left: 0;
+                                width: 100%;
+                                height: 100%;
+                                pointer-events: none;"></div>
+                    <div id="nodes-layer"
+                         style="position: absolute;
+                                top: 0;
+                                left: 0;
+                                width: 100%;
+                                height: 100%;"></div>
+                </div>
+            `;
+        },
+        
+        // Create main layout
+        createLayout: function() {
+            return `
+                <div id="nodepad-app"
+                     style="display: flex;
+                            width: 100%;
+                            height: 100vh;
+                            font-family: system-ui, -apple-system, sans-serif;
+                            color: #333;">
+                    ${this.createCanvas()}
+                    ${this.createEditor()}
+                </div>
+                <style>
+                    * { box-sizing: border-box; margin: 0; padding: 0; }
+                    
+                    .nodepad-node:hover {
+                        transform: translate(-50%, -50%) scale(1.05) !important;
+                    }
+                    
+                    .nodepad-node.selected {
+                        border: 2px solid #4a6fa5 !important;
+                        box-shadow: 0 0 0 3px rgba(74,111,165,0.2) !important;
+                    }
+                    
+                    .nodepad-node.dragging {
+                        opacity: 0.8;
+                        cursor: grabbing !important;
+                        transform: translate(-50%, -50%) scale(1.1) !important;
+                        z-index: 30 !important;
+                    }
+                    
+                    #editor-content:focus {
+                        border-left-color: #4a6fa5 !important;
+                    }
+                    
+                    #editor-content:empty:before {
+                        content: attr(data-placeholder);
+                        color: #999;
+                        position: absolute;
+                        pointer-events: none;
+                    }
+                    
+                    #editor-emoji:hover {
+                        background: rgba(74,111,165,0.1);
+                    }
+                    
+                    .emoji-option:hover {
+                        background: rgba(74,111,165,0.1) !important;
+                    }
+                    
+                    .nav-btn {
+                        padding: 4px;
+                        margin: 0 4px;
+                        font-size: 20px;
+                        background: none;
+                        border: 1px solid #e0e0e0;
+                        border-radius: 4px;
+                        cursor: pointer;
+                        transition: all 0.2s;
+                    }
+                    
+                    .nav-btn:hover, .nav-btn:focus {
+                        background: rgba(74,111,165,0.1);
+                        outline: 2px solid #4a6fa5;
+                    }
+                    
+                    #add-node-btn:focus, #delete-node-btn:focus {
+                        outline: 2px solid #4a6fa5;
+                        outline-offset: 2px;
+                    }
+                    
+                    #save-status.visible {
+                        opacity: 1 !important;
+                    }
+                    
+                    #save-status.saved {
+                        color: #4CAF50 !important;
+                    }
+                </style>
+            `;
+        },
+        
+        // Update connection position
+        updateConnection: function(connId) {
+            const svg = document.getElementById(connId);
+            if (!svg) return;
+            
+            const fromNode = document.getElementById(svg.dataset.from);
+            const toNode = document.getElementById(svg.dataset.to);
+            
+            if (!fromNode || !toNode) return;
+            
+            const canvas = document.getElementById('nodepad-canvas');
+            const canvasRect = canvas.getBoundingClientRect();
+            
+            // Get node positions in pixels
+            const fromX = (parseFloat(fromNode.style.left) / 100) * canvasRect.width;
+            const fromY = (parseFloat(fromNode.style.top) / 100) * canvasRect.height;
+            const toX = (parseFloat(toNode.style.left) / 100) * canvasRect.width;
+            const toY = (parseFloat(toNode.style.top) / 100) * canvasRect.height;
+            
+            // Calculate bounding box
+            const minX = Math.min(fromX, toX);
+            const minY = Math.min(fromY, toY);
+            const width = Math.abs(toX - fromX);
+            const height = Math.abs(toY - fromY);
+            
+            // Position SVG
+            svg.style.left = `${minX}px`;
+            svg.style.top = `${minY}px`;
+            svg.style.width = `${width || 1}px`;
+            svg.style.height = `${height || 1}px`;
+            
+            // Update line coordinates relative to SVG origin
+            const line = svg.querySelector('line');
+            line.setAttribute('x1', fromX - minX);
+            line.setAttribute('y1', fromY - minY);
+            line.setAttribute('x2', toX - minX);
+            line.setAttribute('y2', toY - minY);
+        },
+        
+        // Update all connections for a node
+        updateNodeConnections: function(nodeId) {
+            const connections = document.querySelectorAll(
+                `.nodepad-connection[data-from="${nodeId}"], .nodepad-connection[data-to="${nodeId}"]`
+            );
+            connections.forEach(conn => this.updateConnection(conn.id));
+        },
+        
+        // Utility to escape HTML
+        escapeHtml: function(text) {
+            const div = document.createElement('div');
+            div.textContent = text || '';
+            return div.innerHTML;
+        }
+    };
+    
+    // Main controller
+    const NodePad = {
+        init: function(containerId) {
+            Logger.init();
+            
+            const container = document.getElementById(containerId);
+            container.innerHTML = NodePadAPI.createLayout();
+            
+            // Create initial node
+            const nodesLayer = document.getElementById('nodes-layer');
+            nodesLayer.innerHTML = NodePadAPI.createNode({
+                x: 50,
+                y: 50,
+                content: ''
+            });
+            
+            // Select initial node
+            const firstNode = nodesLayer.firstElementChild;
+            this.selectNode(firstNode.id);
+            
+            this.attachEventListeners();
+            
+            // Focus editor - this is a notepad!
+            document.getElementById('editor-content').focus();
+            
+            Logger.log('Initialized with default node');
+            
+            return this;
+        },
+        
+        attachEventListeners: function() {
+            // Node clicks
+            document.addEventListener('click', (e) => {
+                // Node selection
+                if (e.target.closest('.nodepad-node')) {
+                    this.selectNode(e.target.closest('.nodepad-node').id);
+                }
+                
+                // Add button
+                if (e.target.id === 'add-node-btn') {
+                    this.createChildNode();
+                }
+                
+                // Delete button
+                if (e.target.id === 'delete-node-btn') {
+                    this.deleteSelectedNode();
+                }
+                
+                // Emoji picker toggle
+                if (e.target.id === 'editor-emoji') {
+                    this.toggleEmojiPicker();
+                }
+                
+                // Emoji selection
+                if (e.target.classList.contains('emoji-option')) {
+                    this.selectEmoji(e.target.dataset.emoji);
+                }
+                
+                // Navigation buttons
+                if (e.target.classList.contains('nav-btn')) {
+                    this.selectNode(e.target.dataset.nodeId);
+                    // Always return focus to editor
+                    setTimeout(() => {
+                        document.getElementById('editor-content').focus();
+                    }, 0);
+                }
+            });
+            
+            // Click outside emoji picker
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('#emoji-picker') && e.target.id !== 'editor-emoji') {
+                    document.getElementById('emoji-picker').style.display = 'none';
+                }
+            });
+            
+            // Content editing
+            document.getElementById('editor-content').addEventListener('input', (e) => {
+                const selected = document.querySelector('.nodepad-node.selected');
+                if (selected) {
+                    selected.dataset.content = e.target.textContent;
+                    this.showSaveStatus();
+                    Logger.log('Content updated', { nodeId: selected.id });
+                }
+            });
+            
+            // Focus styling
+            document.getElementById('editor-content').addEventListener('focus', () => {
+                document.getElementById('nodepad-editor').style.borderLeftColor = '#4a6fa5';
+            });
+            
+            document.getElementById('editor-content').addEventListener('blur', () => {
+                document.getElementById('nodepad-editor').style.borderLeftColor = '#e0e0e0';
+            });
+            
+            // Keyboard shortcuts
+            document.addEventListener('keydown', (e) => {
+                // Alt shortcuts to avoid browser conflicts
+                if (e.altKey) {
+                    if (e.key === 'n') {
+                        e.preventDefault();
+                        this.createChildNode();
+                        Logger.log('Keyboard shortcut: New node', { key: 'Alt+N' });
+                    }
+                    if (e.key === 'd') {
+                        e.preventDefault();
+                        this.deleteSelectedNode();
+                        Logger.log('Keyboard shortcut: Delete node', { key: 'Alt+D' });
+                    }
+                }
+                
+                // Tab navigation from editor
+                if (e.key === 'Tab' && e.target.id === 'editor-content') {
+                    e.preventDefault();
+                    // Focus first nav button or add button
+                    const firstNav = document.querySelector('.nav-btn');
+                    const target = firstNav || document.getElementById('add-node-btn');
+                    if (target) {
+                        target.focus();
+                        Logger.log('Tab navigation from editor');
+                    }
+                }
+                
+                // Enter on buttons creates child and returns focus
+                if (e.key === 'Enter') {
+                    if (e.target.classList.contains('nav-btn') || e.target.id === 'add-node-btn') {
+                        e.preventDefault();
+                        this.createChildNode();
+                    }
+                    if (e.target.id === 'delete-node-btn') {
+                        e.preventDefault();
+                        this.deleteSelectedNode();
+                    }
+                }
+                
+                // Save indicator
+                if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                    e.preventDefault();
+                    this.showSaveStatus();
+                    Logger.log('Keyboard shortcut: Save', { key: 'Ctrl+Enter' });
+                }
+            });
+            
+            // Drag handling
+            this.setupDragHandling();
+            
+            // Keep editor focused after emoji picker closes
+            document.getElementById('emoji-picker').addEventListener('click', (e) => {
+                if (e.target.classList.contains('emoji-option')) {
+                    setTimeout(() => {
+                        document.getElementById('editor-content').focus();
+                    }, 0);
+                }
+            });
+        },
+        
+        setupDragHandling: function() {
+            let dragData = null;
+            let isDragging = false;
+            const dragThreshold = 3;
+            
+            document.addEventListener('mousedown', (e) => {
+                const node = e.target.closest('.nodepad-node');
+                if (!node || e.button !== 0) return;
+                
+                e.preventDefault();
+                
+                dragData = {
+                    nodeId: node.id,
+                    startX: e.clientX,
+                    startY: e.clientY,
+                    nodeStartX: parseFloat(node.style.left),
+                    nodeStartY: parseFloat(node.style.top)
+                };
+                
+                Logger.log('Drag started', { nodeId: node.id });
+            });
+            
+            document.addEventListener('mousemove', (e) => {
+                if (!dragData) return;
+                
+                const deltaX = Math.abs(e.clientX - dragData.startX);
+                const deltaY = Math.abs(e.clientY - dragData.startY);
+                
+                if (!isDragging && (deltaX > dragThreshold || deltaY > dragThreshold)) {
+                    isDragging = true;
+                    const node = document.getElementById(dragData.nodeId);
+                    node.classList.add('dragging');
+                }
+                
+                if (isDragging) {
+                    const canvas = document.getElementById('nodepad-canvas');
+                    const canvasRect = canvas.getBoundingClientRect();
+                    
+                    const deltaMouseX = e.clientX - dragData.startX;
+                    const deltaMouseY = e.clientY - dragData.startY;
+                    
+                    const deltaPercentX = (deltaMouseX / canvasRect.width) * 100;
+                    const deltaPercentY = (deltaMouseY / canvasRect.height) * 100;
+                    
+                    let newX = dragData.nodeStartX + deltaPercentX;
+                    let newY = dragData.nodeStartY + deltaPercentY;
+                    
+                    // Constrain to bounds
+                    newX = Math.max(5, Math.min(95, newX));
+                    newY = Math.max(5, Math.min(95, newY));
+                    
+                    const node = document.getElementById(dragData.nodeId);
+                    node.style.left = `${newX}%`;
+                    node.style.top = `${newY}%`;
+                    
+                    // Update connections
+                    NodePadAPI.updateNodeConnections(dragData.nodeId);
+                }
+            });
+            
+            document.addEventListener('mouseup', () => {
+                if (dragData && isDragging) {
+                    const node = document.getElementById(dragData.nodeId);
+                    node.classList.remove('dragging');
+                    Logger.log('Drag ended', { 
+                        nodeId: dragData.nodeId,
+                        finalPosition: { 
+                            x: parseFloat(node.style.left), 
+                            y: parseFloat(node.style.top) 
+                        }
+                    });
+                    
+                    // Return focus to editor after drag
+                    setTimeout(() => {
+                        document.getElementById('editor-content').focus();
+                    }, 0);
+                }
+                
+                dragData = null;
+                isDragging = false;
+            });
+        },
+        
+        selectNode: function(nodeId) {
+            // Clear previous selection
+            document.querySelectorAll('.nodepad-node').forEach(n => {
+                n.classList.remove('selected');
+            });
+            
+            // Select new node
+            const node = document.getElementById(nodeId);
+            if (!node) return;
+            
+            node.classList.add('selected');
+            
+            // Load into editor
+            document.getElementById('editor-emoji').textContent = node.dataset.emoji;
+            document.getElementById('editor-content').textContent = node.dataset.content || '';
+            
+            // Update navigation
+            this.updateNavigation(nodeId);
+            
+            // Always focus editor - it's a notepad!
+            document.getElementById('editor-content').focus();
+            
+            Logger.log('Node selected', { nodeId });
+        },
+        
+        updateNavigation: function(nodeId) {
+            const node = document.getElementById(nodeId);
+            
+            // Parent navigation
+            const parentNav = document.getElementById('parent-nav');
+            parentNav.innerHTML = '';
+            
+            if (node.dataset.parentId) {
+                const parent = document.getElementById(node.dataset.parentId);
+                if (parent) {
+                    parentNav.innerHTML = `
+                        <div class="nav-btn" 
+                             data-node-id="${parent.id}"
+                             title="Go to parent"
+                             tabindex="0">${parent.dataset.emoji}</div>
+                    `;
+                }
+            }
+            
+            // Children navigation
+            const childrenNav = document.getElementById('children-nav');
+            childrenNav.innerHTML = '';
+            
+            const children = document.querySelectorAll(`[data-parent-id="${nodeId}"]`);
+            children.forEach(child => {
+                childrenNav.innerHTML += `
+                    <div class="nav-btn" 
+                         data-node-id="${child.id}"
+                         title="${child.dataset.content || 'Child node'}"
+                         tabindex="0">${child.dataset.emoji}</div>
+                `;
+            });
+        },
+        
+        createChildNode: function() {
+            const selected = document.querySelector('.nodepad-node.selected');
+            if (!selected) return;
+            
+            const parentData = {
+                id: selected.id,
+                x: parseFloat(selected.style.left),
+                y: parseFloat(selected.style.top),
+                emoji: selected.dataset.emoji
+            };
+            
+            // Calculate child position
+            const childCount = document.querySelectorAll(`[data-parent-id="${parentData.id}"]`).length;
+            const angleStep = (Math.PI * 2) / 8;
+            const angle = childCount * angleStep;
+            const distance = 20;
+            
+            const childX = Math.max(5, Math.min(95, parentData.x + Math.cos(angle) * distance));
+            const childY = Math.max(5, Math.min(95, parentData.y + Math.sin(angle) * distance));
+            
+            // Get next emoji
+            const emojiProgression = {
+                '✏️': '📋',
+                '📋': '📝',
+                '📝': '🛠️',
+                '🛠️': '✅',
+                '🌱': '🪴',
+                '🪴': '🌿',
+                '🌿': '🌳'
+            };
+            const nextEmoji = emojiProgression[parentData.emoji] || '📋';
+            
+            // Create node
+            const nodeHtml = NodePadAPI.createNode({
+                x: childX,
+                y: childY,
+                emoji: nextEmoji,
+                content: '',
+                parentId: parentData.id
+            });
+            
+            document.getElementById('nodes-layer').insertAdjacentHTML('beforeend', nodeHtml);
+            const newNode = document.getElementById('nodes-layer').lastElementChild;
+            
+            // Create connection
+            const connHtml = NodePadAPI.createConnection(parentData.id, newNode.id);
+            document.getElementById('connections-layer').insertAdjacentHTML('beforeend', connHtml);
+            
+            // Update connection position
+            const newConn = document.getElementById('connections-layer').lastElementChild;
+            NodePadAPI.updateConnection(newConn.id);
+            
+            // Select new node
+            this.selectNode(newNode.id);
+            
+            // Critical: Return focus to editor for continuous note-taking
+            setTimeout(() => {
+                document.getElementById('editor-content').focus();
+            }, 0);
+            
+            Logger.log('Child node created', { 
+                parentId: parentData.id, 
+                childId: newNode.id 
+            });
+        },
+        
+        deleteSelectedNode: function() {
+            const selected = document.querySelector('.nodepad-node.selected');
+            if (!selected) return;
+            
+            const nodeId = selected.id;
+            const childCount = document.querySelectorAll(`[data-parent-id="${nodeId}"]`).length;
+            
+            // Confirm if has children
+            if (childCount > 0) {
+                if (!confirm(`Delete this node and its ${childCount} child node${childCount > 1 ? 's' : ''}?`)) {
+                    return;
+                }
+            }
+            
+            // Delete recursively
+            this.deleteNodeRecursive(nodeId);
+            
+            // Select parent if exists
+            if (selected.dataset.parentId) {
+                this.selectNode(selected.dataset.parentId);
+            } else {
+                // Clear editor if no parent
+                document.getElementById('editor-emoji').textContent = '✏️';
+                document.getElementById('editor-content').textContent = '';
+                this.updateNavigation(null);
+            }
+            
+            // Return focus to editor
+            setTimeout(() => {
+                document.getElementById('editor-content').focus();
+            }, 0);
+            
+            Logger.log('Node deleted', { nodeId });
+        },
+        
+        deleteNodeRecursive: function(nodeId) {
+            // Delete children first
+            const children = document.querySelectorAll(`[data-parent-id="${nodeId}"]`);
+            children.forEach(child => this.deleteNodeRecursive(child.id));
+            
+            // Delete connections
+            const connections = document.querySelectorAll(
+                `.nodepad-connection[data-from="${nodeId}"], .nodepad-connection[data-to="${nodeId}"]`
+            );
+            connections.forEach(conn => conn.remove());
+            
+            // Delete node
+            document.getElementById(nodeId)?.remove();
+        },
+        
+        toggleEmojiPicker: function() {
+            const picker = document.getElementById('emoji-picker');
+            picker.style.display = picker.style.display === 'none' ? 'block' : 'none';
+        },
+        
+        selectEmoji: function(emoji) {
+            const selected = document.querySelector('.nodepad-node.selected');
+            if (!selected) return;
+            
+            selected.dataset.emoji = emoji;
+            selected.querySelector('.node-emoji').textContent = emoji;
+            document.getElementById('editor-emoji').textContent = emoji;
+            document.getElementById('emoji-picker').style.display = 'none';
+            
+            this.showSaveStatus();
+            Logger.log('Emoji updated', { nodeId: selected.id, emoji });
+        },
+        
+        showSaveStatus: function() {
+            const status = document.getElementById('save-status');
+            status.textContent = 'Saved';
+            status.classList.add('visible', 'saved');
+            
+            setTimeout(() => {
+                status.classList.remove('visible');
+            }, 2000);
+        },
+        
+        // Public API methods
+        exportGraph: function() {
+            const nodes = [];
+            const connections = [];
+            
+            document.querySelectorAll('.nodepad-node').forEach(node => {
+                nodes.push({
+                    id: node.id,
+                    emoji: node.dataset.emoji,
+                    content: node.dataset.content,
+                    position: {
+                        x: parseFloat(node.style.left),
+                        y: parseFloat(node.style.top)
+                    },
+                    parent: node.dataset.parentId || null
+                });
+            });
+            
+            document.querySelectorAll('.nodepad-connection').forEach(conn => {
+                connections.push({
+                    source: conn.dataset.from,
+                    target: conn.dataset.to
+                });
+            });
+            
+            return { nodes, connections };
+        },
+        
+        importGraph: function(data) {
+            if (!data || !data.nodes) return false;
+            
+            // Clear existing
+            document.getElementById('nodes-layer').innerHTML = '';
+            document.getElementById('connections-layer').innerHTML = '';
+            
+            // Create nodes
+            data.nodes.forEach(nodeData => {
+                const nodeHtml = NodePadAPI.createNode({
+                    id: nodeData.id,
+                    x: nodeData.position.x,
+                    y: nodeData.position.y,
+                    emoji: nodeData.emoji,
+                    content: nodeData.content,
+                    parentId: nodeData.parent
+                });
+                document.getElementById('nodes-layer').insertAdjacentHTML('beforeend', nodeHtml);
+            });
+            
+            // Create connections
+            if (data.connections) {
+                data.connections.forEach(conn => {
+                    const connHtml = NodePadAPI.createConnection(conn.source, conn.target);
+                    document.getElementById('connections-layer').insertAdjacentHTML('beforeend', connHtml);
+                });
+                
+                // Update all connection positions
+                document.querySelectorAll('.nodepad-connection').forEach(conn => {
+                    NodePadAPI.updateConnection(conn.id);
+                });
+            }
+            
+            // Select first node
+            const firstNode = document.querySelector('.nodepad-node');
+            if (firstNode) {
+                this.selectNode(firstNode.id);
+            }
+            
+            Logger.log('Graph imported', { nodeCount: data.nodes.length });
+            return true;
+        }
+    };
+    
+    // Public API
+    window.NodePad = {
+        init: (containerId) => NodePad.init(containerId),
+        createNode: (options) => {
+            const nodeHtml = NodePadAPI.createNode(options);
+            document.getElementById('nodes-layer').insertAdjacentHTML('beforeend', nodeHtml);
+            const newNode = document.getElementById('nodes-layer').lastElementChild;
+            // Always return focus to editor
+            setTimeout(() => {
+                document.getElementById('editor-content').focus();
+            }, 0);
+            return newNode.id;
+        },
+        selectNode: (nodeId) => NodePad.selectNode(nodeId),
+        deleteNode: (nodeId) => NodePad.deleteNodeRecursive(nodeId),
+        exportGraph: () => NodePad.exportGraph(),
+        importGraph: (data) => NodePad.importGraph(data),
+        getSelectedNode: () => document.querySelector('.nodepad-node.selected')?.id || null,
+        updateNode: (nodeId, updates) => {
+            const node = document.getElementById(nodeId);
+            if (!node) return false;
+            
+            if (updates.emoji) {
+                node.dataset.emoji = updates.emoji;
+                node.querySelector('.node-emoji').textContent = updates.emoji;
+            }
+            if (updates.content !== undefined) {
+                node.dataset.content = updates.content;
+            }
+            if (updates.x !== undefined) {
+                node.style.left = `${updates.x}%`;
+                NodePadAPI.updateNodeConnections(nodeId);
+            }
+            if (updates.y !== undefined) {
+                node.style.top = `${updates.y}%`;
+                NodePadAPI.updateNodeConnections(nodeId);
+            }
+            
+            return true;
+        }
+    };
+    
+    // Initialize on load
+    document.addEventListener('DOMContentLoaded', () => {
+        NodePad.init('app');
+    });
+    </script>
+</body>
+</html>

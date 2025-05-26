@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GARDEN Backlog Manager</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background: #f5f8fa;
+            color: #333;
+            min-height: 100vh;
+        }
+        
+        .header {
+            background: #4a6fa5;
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .controls {
+            background: white;
+            padding: 1rem 2rem;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .filter-group {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        
+        .filter-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .filter-btn.active {
+            background: #4a6fa5;
+            color: white;
+            border-color: #4a6fa5;
+        }
+        
+        .board {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            padding: 2rem;
+            min-height: calc(100vh - 200px);
+        }
+        
+        .column {
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .column-header {
+            font-weight: bold;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid;
+        }
+        
+        .backlog { border-color: #6c757d; }
+        .todo { border-color: #007bff; }
+        .progress { border-color: #ffc107; }
+        .done { border-color: #28a745; }
+        
+        .card {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            cursor: move;
+            transition: all 0.2s;
+        }
+        
+        .card:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            transform: translateY(-1px);
+        }
+        
+        .card.dragging {
+            opacity: 0.5;
+            transform: rotate(5deg);
+        }
+        
+        .card-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .card-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+            color: #666;
+        }
+        
+        .project-tag {
+            background: #e9ecef;
+            padding: 0.2rem 0.5rem;
+            border-radius: 3px;
+            font-size: 0.7rem;
+        }
+        
+        .priority {
+            font-weight: bold;
+        }
+        
+        .priority.P0 { color: #dc3545; }
+        .priority.P1 { color: #fd7e14; }
+        .priority.P2 { color: #ffc107; }
+        .priority.P3 { color: #28a745; }
+        
+        .add-card {
+            border: 2px dashed #ddd;
+            background: transparent;
+            color: #666;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .add-card:hover {
+            border-color: #4a6fa5;
+            color: #4a6fa5;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+        
+        .modal-content {
+            background: white;
+            width: 500px;
+            margin: 10% auto;
+            padding: 2rem;
+            border-radius: 8px;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .form-group textarea {
+            height: 80px;
+            resize: vertical;
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 1.5rem;
+        }
+        
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        .btn-primary {
+            background: #4a6fa5;
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .export-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🌻 GARDEN Backlog Manager</h1>
+        <div>
+            <button class="export-btn" onclick="exportData()">📤 Export</button>
+            <input type="file" id="importFile" accept=".json" style="display: none" onchange="importData(event)">
+            <button class="export-btn" onclick="document.getElementById('importFile').click()">📥 Import</button>
+        </div>
+    </div>
+    
+    <div class="controls">
+        <div class="filter-group">
+            <span>Project:</span>
+            <button class="filter-btn active" data-project="all">All</button>
+            <button class="filter-btn" data-project="core">Core</button>
+            <button class="filter-btn" data-project="nodepad">NodePad</button>
+            <button class="filter-btn" data-project="deploy">Deploy</button>
+            <button class="filter-btn" data-project="collab">Collab</button>
+            <button class="filter-btn" data-project="personal">Personal</button>
+        </div>
+        
+        <div class="filter-group">
+            <span>Priority:</span>
+            <button class="filter-btn active" data-priority="all">All</button>
+            <button class="filter-btn" data-priority="P0">P0</button>
+            <button class="filter-btn" data-priority="P1">P1</button>
+            <button class="filter-btn" data-priority="P2">P2</button>
+            <button class="filter-btn" data-priority="P3">P3</button>
+        </div>
+    </div>
+    
+    <div class="board">
+        <div class="column" data-status="backlog">
+            <div class="column-header backlog">📥 Backlog</div>
+            <div class="card add-card" onclick="showAddCard('backlog')">
+                + Add Item
+            </div>
+        </div>
+        
+        <div class="column" data-status="todo">
+            <div class="column-header todo">📋 To Do</div>
+            <div class="card add-card" onclick="showAddCard('todo')">
+                + Add Item
+            </div>
+        </div>
+        
+        <div class="column" data-status="progress">
+            <div class="column-header progress">🔧 In Progress</div>
+            <div class="card add-card" onclick="showAddCard('progress')">
+                + Add Item
+            </div>
+        </div>
+        
+        <div class="column" data-status="done">
+            <div class="column-header done">✅ Done</div>
+            <div class="card add-card" onclick="showAddCard('done')">
+                + Add Item
+            </div>
+        </div>
+    </div>
+    
+    <div id="cardModal" class="modal">
+        <div class="modal-content">
+            <h3 id="modalTitle">Add New Item</h3>
+            <form id="cardForm">
+                <div class="form-group">
+                    <label>Title:</label>
+                    <input type="text" id="cardTitle" required>
+                </div>
+                <div class="form-group">
+                    <label>Description:</label>
+                    <textarea id="cardDescription"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Project:</label>
+                    <select id="cardProject">
+                        <option value="core">Core</option>
+                        <option value="nodepad">NodePad</option>
+                        <option value="deploy">Deploy</option>
+                        <option value="collab">Collab</option>
+                        <option value="personal">Personal</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Priority:</label>
+                    <select id="cardPriority">
+                        <option value="P0">P0 - Critical</option>
+                        <option value="P1">P1 - High</option>
+                        <option value="P2">P2 - Medium</option>
+                        <option value="P3">P3 - Low</option>
+                    </select>
+                </div>
+                <div class="btn-group">
+                    <button type="button" class="btn btn-secondary" onclick="hideModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let backlogData = JSON.parse(localStorage.getItem('gardenBacklog') || '[]');
+        let draggedElement = null;
+        let currentFilters = { project: 'all', priority: 'all' };
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            renderCards();
+            setupEventListeners();
+            loadSampleData();
+        });
+        
+        function setupEventListeners() {
+            // Filter buttons
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const filterType = this.dataset.project ? 'project' : 'priority';
+                    const filterValue = this.dataset.project || this.dataset.priority;
+                    
+                    // Update active state
+                    this.parentElement.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Update filters
+                    currentFilters[filterType] = filterValue;
+                    renderCards();
+                });
+            });
+            
+            // Form submission
+            document.getElementById('cardForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                saveCard();
+            });
+            
+            // Drag and drop
+            setupDragAndDrop();
+        }
+        
+        function setupDragAndDrop() {
+            document.addEventListener('dragstart', function(e) {
+                if (e.target.classList.contains('card') && !e.target.classList.contains('add-card')) {
+                    draggedElement = e.target;
+                    e.target.classList.add('dragging');
+                }
+            });
+            
+            document.addEventListener('dragend', function(e) {
+                if (e.target.classList.contains('card')) {
+                    e.target.classList.remove('dragging');
+                    draggedElement = null;
+                }
+            });
+            
+            document.querySelectorAll('.column').forEach(column => {
+                column.addEventListener('dragover', function(e) {
+                    e.preventDefault();
+                });
+                
+                column.addEventListener('drop', function(e) {
+                    e.preventDefault();
+                    if (draggedElement) {
+                        const newStatus = this.dataset.status;
+                        const cardId = draggedElement.dataset.cardId;
+                        updateCardStatus(cardId, newStatus);
+                    }
+                });
+            });
+        }
+        
+        function renderCards() {
+            // Clear columns
+            document.querySelectorAll('.column').forEach(column => {
+                const addCard = column.querySelector('.add-card');
+                column.innerHTML = '';
+                column.appendChild(column.querySelector('.column-header') || createColumnHeader(column.dataset.status));
+                column.appendChild(addCard);
+            });
+            
+            // Filter and render cards
+            const filteredData = backlogData.filter(item => {
+                const projectMatch = currentFilters.project === 'all' || item.project === currentFilters.project;
+                const priorityMatch = currentFilters.priority === 'all' || item.priority === currentFilters.priority;
+                return projectMatch && priorityMatch;
+            });
+            
+            filteredData.forEach(item => {
+                const cardElement = createCardElement(item);
+                const column = document.querySelector(`[data-status="${item.status}"]`);
+                const addCard = column.querySelector('.add-card');
+                column.insertBefore(cardElement, addCard);
+            });
+        }
+        
+        function createCardElement(item) {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.draggable = true;
+            card.dataset.cardId = item.id;
+            
+            card.innerHTML = `
+                <div class="card-title">${item.title}</div>
+                <div>${item.description}</div>
+                <div class="card-meta">
+                    <span class="project-tag">${item.project}</span>
+                    <span class="priority ${item.priority}">${item.priority}</span>
+                </div>
+            `;
+            
+            return card;
+        }
+        
+        function createColumnHeader(status) {
+            const headers = {
+                backlog: '📥 Backlog',
+                todo: '📋 To Do', 
+                progress: '🔧 In Progress',
+                done: '✅ Done'
+            };
+            
+            const header = document.createElement('div');
+            header.className = `column-header ${status}`;
+            header.textContent = headers[status];
+            return header;
+        }
+        
+        function showAddCard(status) {
+            document.getElementById('modalTitle').textContent = 'Add New Item';
+            document.getElementById('cardForm').reset();
+            document.getElementById('cardModal').style.display = 'block';
+            document.getElementById('cardForm').dataset.status = status;
+        }
+        
+        function hideModal() {
+            document.getElementById('cardModal').style.display = 'none';
+        }
+        
+        function saveCard() {
+            const form = document.getElementById('cardForm');
+            const newCard = {
+                id: Date.now().toString(),
+                title: document.getElementById('cardTitle').value,
+                description: document.getElementById('cardDescription').value,
+                project: document.getElementById('cardProject').value,
+                priority: document.getElementById('cardPriority').value,
+                status: form.dataset.status || 'backlog',
+                created: new Date().toISOString()
+            };
+            
+            backlogData.push(newCard);
+            saveData();
+            renderCards();
+            hideModal();
+        }
+        
+        function updateCardStatus(cardId, newStatus) {
+            const card = backlogData.find(item => item.id === cardId);
+            if (card) {
+                card.status = newStatus;
+                saveData();
+                renderCards();
+            }
+        }
+        
+        function saveData() {
+            localStorage.setItem('gardenBacklog', JSON.stringify(backlogData));
+        }
+        
+        function exportData() {
+            const dataStr = JSON.stringify(backlogData, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `garden-backlog-${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+        }
+        
+        function importData(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const importedData = JSON.parse(e.target.result);
+                        if (confirm('Import data? This will replace current backlog.')) {
+                            backlogData = importedData;
+                            saveData();
+                            renderCards();
+                        }
+                    } catch (error) {
+                        alert('Error importing file');
+                    }
+                };
+                reader.readAsText(file);
+            }
+        }
+        
+        function loadSampleData() {
+            if (backlogData.length === 0) {
+                backlogData = [
+                    {
+                        id: '1',
+                        title: 'Move more out of core app before other ideas',
+                        description: 'Critical audit priority from mobile capture',
+                        project: 'core',
+                        priority: 'P0',
+                        status: 'todo',
+                        created: new Date().toISOString()
+                    },
+                    {
+                        id: '2', 
+                        title: 'Garden Grafter phases implementation',
+                        description: 'Complete the phase-based deployment plan',
+                        project: 'deploy',
+                        priority: 'P1',
+                        status: 'backlog',
+                        created: new Date().toISOString()
+                    }
+                ];
+                saveData();
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+# iOS-Open-GPX-Tracker Fork Reference
+
+Original Repository: https://github.com/merlos/iOS-Open-GPX-Tracker
+Fork Date: May 21, 2025
+Fork Purpose: Integration with sailingWatch project
+
+This is a local copy of the iOS-Open-GPX-Tracker repository.
+Original project by merlos - https://github.com/merlos/iOS-Open-GPX-Tracker
+
+Last synced: May 21, 2025

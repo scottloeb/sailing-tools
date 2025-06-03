@@ -1,0 +1,671 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		662FEC792DDE824300D2CFE2 /* sailingWatch Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 662FEC782DDE824300D2CFE2 /* sailingWatch Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		662FEC7A2DDE824300D2CFE2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 662FEC6C2DDE824300D2CFE2 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 662FEC772DDE824300D2CFE2;
+			remoteInfo = "sailingWatch Watch App";
+		};
+		662FEC882DDE824400D2CFE2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 662FEC6C2DDE824300D2CFE2 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 662FEC772DDE824300D2CFE2;
+			remoteInfo = "sailingWatch Watch App";
+		};
+		662FEC922DDE824400D2CFE2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 662FEC6C2DDE824300D2CFE2 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 662FEC772DDE824300D2CFE2;
+			remoteInfo = "sailingWatch Watch App";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		662FEC9E2DDE824400D2CFE2 /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			files = (
+				662FEC792DDE824300D2CFE2 /* sailingWatch Watch App.app in Embed Watch Content */,
+			);
+			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		662FEC722DDE824300D2CFE2 /* sailingWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = sailingWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		662FEC782DDE824300D2CFE2 /* sailingWatch Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "sailingWatch Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		662FEC872DDE824400D2CFE2 /* sailingWatch Watch AppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "sailingWatch Watch AppTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		662FEC912DDE824400D2CFE2 /* sailingWatch Watch AppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "sailingWatch Watch AppUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		662FEC7C2DDE824300D2CFE2 /* sailingWatch Watch App */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "sailingWatch Watch App";
+			sourceTree = "<group>";
+		};
+		662FEC8A2DDE824400D2CFE2 /* sailingWatch Watch AppTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "sailingWatch Watch AppTests";
+			sourceTree = "<group>";
+		};
+		662FEC942DDE824400D2CFE2 /* sailingWatch Watch AppUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "sailingWatch Watch AppUITests";
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		662FEC752DDE824300D2CFE2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		662FEC842DDE824400D2CFE2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		662FEC8E2DDE824400D2CFE2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		662FEC6B2DDE824300D2CFE2 = {
+			isa = PBXGroup;
+			children = (
+				662FEC7C2DDE824300D2CFE2 /* sailingWatch Watch App */,
+				662FEC8A2DDE824400D2CFE2 /* sailingWatch Watch AppTests */,
+				662FEC942DDE824400D2CFE2 /* sailingWatch Watch AppUITests */,
+				662FEC732DDE824300D2CFE2 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		662FEC732DDE824300D2CFE2 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				662FEC722DDE824300D2CFE2 /* sailingWatch.app */,
+				662FEC782DDE824300D2CFE2 /* sailingWatch Watch App.app */,
+				662FEC872DDE824400D2CFE2 /* sailingWatch Watch AppTests.xctest */,
+				662FEC912DDE824400D2CFE2 /* sailingWatch Watch AppUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		662FEC712DDE824300D2CFE2 /* sailingWatch */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 662FEC9F2DDE824400D2CFE2 /* Build configuration list for PBXNativeTarget "sailingWatch" */;
+			buildPhases = (
+				662FEC702DDE824300D2CFE2 /* Resources */,
+				662FEC9E2DDE824400D2CFE2 /* Embed Watch Content */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				662FEC7B2DDE824300D2CFE2 /* PBXTargetDependency */,
+			);
+			name = sailingWatch;
+			packageProductDependencies = (
+			);
+			productName = sailingWatch;
+			productReference = 662FEC722DDE824300D2CFE2 /* sailingWatch.app */;
+			productType = "com.apple.product-type.application.watchapp2-container";
+		};
+		662FEC772DDE824300D2CFE2 /* sailingWatch Watch App */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 662FEC9B2DDE824400D2CFE2 /* Build configuration list for PBXNativeTarget "sailingWatch Watch App" */;
+			buildPhases = (
+				662FEC742DDE824300D2CFE2 /* Sources */,
+				662FEC752DDE824300D2CFE2 /* Frameworks */,
+				662FEC762DDE824300D2CFE2 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				662FEC7C2DDE824300D2CFE2 /* sailingWatch Watch App */,
+			);
+			name = "sailingWatch Watch App";
+			packageProductDependencies = (
+			);
+			productName = "sailingWatch Watch App";
+			productReference = 662FEC782DDE824300D2CFE2 /* sailingWatch Watch App.app */;
+			productType = "com.apple.product-type.application";
+		};
+		662FEC862DDE824400D2CFE2 /* sailingWatch Watch AppTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 662FECA22DDE824400D2CFE2 /* Build configuration list for PBXNativeTarget "sailingWatch Watch AppTests" */;
+			buildPhases = (
+				662FEC832DDE824400D2CFE2 /* Sources */,
+				662FEC842DDE824400D2CFE2 /* Frameworks */,
+				662FEC852DDE824400D2CFE2 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				662FEC892DDE824400D2CFE2 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				662FEC8A2DDE824400D2CFE2 /* sailingWatch Watch AppTests */,
+			);
+			name = "sailingWatch Watch AppTests";
+			packageProductDependencies = (
+			);
+			productName = "sailingWatch Watch AppTests";
+			productReference = 662FEC872DDE824400D2CFE2 /* sailingWatch Watch AppTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		662FEC902DDE824400D2CFE2 /* sailingWatch Watch AppUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 662FECA52DDE824400D2CFE2 /* Build configuration list for PBXNativeTarget "sailingWatch Watch AppUITests" */;
+			buildPhases = (
+				662FEC8D2DDE824400D2CFE2 /* Sources */,
+				662FEC8E2DDE824400D2CFE2 /* Frameworks */,
+				662FEC8F2DDE824400D2CFE2 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				662FEC932DDE824400D2CFE2 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				662FEC942DDE824400D2CFE2 /* sailingWatch Watch AppUITests */,
+			);
+			name = "sailingWatch Watch AppUITests";
+			packageProductDependencies = (
+			);
+			productName = "sailingWatch Watch AppUITests";
+			productReference = 662FEC912DDE824400D2CFE2 /* sailingWatch Watch AppUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		662FEC6C2DDE824300D2CFE2 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1630;
+				LastUpgradeCheck = 1630;
+				TargetAttributes = {
+					662FEC712DDE824300D2CFE2 = {
+						CreatedOnToolsVersion = 16.3;
+					};
+					662FEC772DDE824300D2CFE2 = {
+						CreatedOnToolsVersion = 16.3;
+					};
+					662FEC862DDE824400D2CFE2 = {
+						CreatedOnToolsVersion = 16.3;
+						TestTargetID = 662FEC772DDE824300D2CFE2;
+					};
+					662FEC902DDE824400D2CFE2 = {
+						CreatedOnToolsVersion = 16.3;
+						TestTargetID = 662FEC772DDE824300D2CFE2;
+					};
+				};
+			};
+			buildConfigurationList = 662FEC6F2DDE824300D2CFE2 /* Build configuration list for PBXProject "sailingWatch" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 662FEC6B2DDE824300D2CFE2;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 662FEC732DDE824300D2CFE2 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				662FEC712DDE824300D2CFE2 /* sailingWatch */,
+				662FEC772DDE824300D2CFE2 /* sailingWatch Watch App */,
+				662FEC862DDE824400D2CFE2 /* sailingWatch Watch AppTests */,
+				662FEC902DDE824400D2CFE2 /* sailingWatch Watch AppUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		662FEC702DDE824300D2CFE2 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		662FEC762DDE824300D2CFE2 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		662FEC852DDE824400D2CFE2 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		662FEC8F2DDE824400D2CFE2 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		662FEC742DDE824300D2CFE2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		662FEC832DDE824400D2CFE2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		662FEC8D2DDE824400D2CFE2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		662FEC7B2DDE824300D2CFE2 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 662FEC772DDE824300D2CFE2 /* sailingWatch Watch App */;
+			targetProxy = 662FEC7A2DDE824300D2CFE2 /* PBXContainerItemProxy */;
+		};
+		662FEC892DDE824400D2CFE2 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 662FEC772DDE824300D2CFE2 /* sailingWatch Watch App */;
+			targetProxy = 662FEC882DDE824400D2CFE2 /* PBXContainerItemProxy */;
+		};
+		662FEC932DDE824400D2CFE2 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 662FEC772DDE824300D2CFE2 /* sailingWatch Watch App */;
+			targetProxy = 662FEC922DDE824400D2CFE2 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		662FEC992DDE824400D2CFE2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 83DT5T9LTS;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		662FEC9A2DDE824400D2CFE2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 83DT5T9LTS;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		662FEC9C2DDE824400D2CFE2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 83DT5T9LTS;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = sailingWatch;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKWatchOnly = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = NeurOasis.sailingWatch.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 11.4;
+			};
+			name = Debug;
+		};
+		662FEC9D2DDE824400D2CFE2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 83DT5T9LTS;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = sailingWatch;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKWatchOnly = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = NeurOasis.sailingWatch.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				VALIDATE_PRODUCT = YES;
+				WATCHOS_DEPLOYMENT_TARGET = 11.4;
+			};
+			name = Release;
+		};
+		662FECA02DDE824400D2CFE2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 83DT5T9LTS;
+				INFOPLIST_KEY_CFBundleDisplayName = sailingWatch;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = NeurOasis.sailingWatch;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		662FECA12DDE824400D2CFE2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 83DT5T9LTS;
+				INFOPLIST_KEY_CFBundleDisplayName = sailingWatch;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = NeurOasis.sailingWatch;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		662FECA32DDE824400D2CFE2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 83DT5T9LTS;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "NeurOasis.sailingWatch-Watch-AppTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/sailingWatch Watch App.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/sailingWatch Watch App";
+				WATCHOS_DEPLOYMENT_TARGET = 11.4;
+			};
+			name = Debug;
+		};
+		662FECA42DDE824400D2CFE2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 83DT5T9LTS;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "NeurOasis.sailingWatch-Watch-AppTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/sailingWatch Watch App.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/sailingWatch Watch App";
+				VALIDATE_PRODUCT = YES;
+				WATCHOS_DEPLOYMENT_TARGET = 11.4;
+			};
+			name = Release;
+		};
+		662FECA62DDE824400D2CFE2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 83DT5T9LTS;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "NeurOasis.sailingWatch-Watch-AppUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				TEST_TARGET_NAME = "sailingWatch Watch App";
+				WATCHOS_DEPLOYMENT_TARGET = 11.4;
+			};
+			name = Debug;
+		};
+		662FECA72DDE824400D2CFE2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 83DT5T9LTS;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "NeurOasis.sailingWatch-Watch-AppUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				TEST_TARGET_NAME = "sailingWatch Watch App";
+				VALIDATE_PRODUCT = YES;
+				WATCHOS_DEPLOYMENT_TARGET = 11.4;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		662FEC6F2DDE824300D2CFE2 /* Build configuration list for PBXProject "sailingWatch" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				662FEC992DDE824400D2CFE2 /* Debug */,
+				662FEC9A2DDE824400D2CFE2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		662FEC9B2DDE824400D2CFE2 /* Build configuration list for PBXNativeTarget "sailingWatch Watch App" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				662FEC9C2DDE824400D2CFE2 /* Debug */,
+				662FEC9D2DDE824400D2CFE2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		662FEC9F2DDE824400D2CFE2 /* Build configuration list for PBXNativeTarget "sailingWatch" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				662FECA02DDE824400D2CFE2 /* Debug */,
+				662FECA12DDE824400D2CFE2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		662FECA22DDE824400D2CFE2 /* Build configuration list for PBXNativeTarget "sailingWatch Watch AppTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				662FECA32DDE824400D2CFE2 /* Debug */,
+				662FECA42DDE824400D2CFE2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		662FECA52DDE824400D2CFE2 /* Build configuration list for PBXNativeTarget "sailingWatch Watch AppUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				662FECA62DDE824400D2CFE2 /* Debug */,
+				662FECA72DDE824400D2CFE2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 662FEC6C2DDE824300D2CFE2 /* Project object */;
+}
